@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asociación de Cazadores</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="cabecera-principal">
+        <h1>Asociación de Cazadores</h1>
+        <div class="menu-navegacion">
+            <button class="btn-tab activo" onclick="cambiarPestaña('vista-barracones', this)">🛡️ Barracones (Personal)</button>
+            <button class="btn-tab" onclick="cambiarPestaña('vista-escuadrones', this)">⚔️ Escuadrones</button>
+            <button class="btn-tab" onclick="cambiarPestaña('vista-misiones', this)">🌍 Misiones</button>
+        </div>
+    </header>
+
+    <div class="contenedor-vistas">
+
+        <div id="vista-barracones" class="vista activa">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Lista de Reclutas</h2>
+                <button onclick="abrirModal('modal-soldado')" class="btn-accion">+ Reclutar Soldado</button>
+            </div>
+            <div id="dashboard-barracones">
+                <div id="columna-lista"><div id="lista-tropas">Cargando personal...</div></div>
+                <div id="columna-detalle">
+                    <div id="tarjeta-vacia" style="text-align: center; color: #888; margin-top: 50px;">Selecciona un recluta.</div>
+                    <div id="tarjeta-soldado" class="tarjeta-soldado" style="position: relative;">
+                        <div class="cabecera-tarjeta">
+                            <img id="detalle-foto" class="foto-soldado" src="" alt="Foto">
+                            <div class="info-principal">
+                                <h2 id="detalle-nombre" style="margin: 0; color: #4CAF50;">Nombre</h2>
+                                <h4 id="detalle-nombre-clave" style="margin: 0; color: #a0a0b5; font-style: italic;">"Clave"</h4>
+                                <span id="detalle-rango-clase" style="color: #FF9800; font-weight: bold; font-size: 0.9rem; display: block; margin-top: 5px;">Rango | Clase (Nvl X)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="datos-grid" style="margin-bottom: 15px;">
+                            <div class="dato-item"><span class="etiqueta">Estado</span><span class="valor" id="detalle-estado" style="color: #4CAF50;">-</span></div>
+                            <div class="dato-item"><span class="etiqueta">Escuadrón</span><span class="valor" id="detalle-escuadron">-</span></div>
+                            <div class="dato-item"><span class="etiqueta">Facción</span><span class="valor" id="detalle-lider" style="color: #FFC107;">-</span></div>
+                            <div class="dato-item"><span class="etiqueta">Alineamiento</span><span class="valor" id="detalle-alineamiento">-</span></div>
+                        </div>
+
+                        <div style="border-top: 1px solid #3f3f5a; padding-top: 15px;">
+                            <h4 style="color: #4CAF50; margin: 0 0 10px 0; font-size: 0.9rem; text-transform: uppercase;">Atributos</h4>
+                            <div style="display: flex; gap: 5px; text-align: center; justify-content: space-between; background-color: #1a1a24; padding: 10px; border-radius: 5px; border-left: 3px solid #4CAF50;">
+                                <div><span style="color:#888; font-size:0.75rem; display:block;">STR</span><strong id="det-str" style="font-size: 1.2rem;">-</strong></div>
+                                <div><span style="color:#888; font-size:0.75rem; display:block;">DEX</span><strong id="det-dex" style="font-size: 1.2rem;">-</strong></div>
+                                <div><span style="color:#888; font-size:0.75rem; display:block;">CON</span><strong id="det-con" style="font-size: 1.2rem;">-</strong></div>
+                                <div><span style="color:#888; font-size:0.75rem; display:block;">INT</span><strong id="det-int" style="font-size: 1.2rem;">-</strong></div>
+                                <div><span style="color:#888; font-size:0.75rem; display:block;">WIS</span><strong id="det-wis" style="font-size: 1.2rem;">-</strong></div>
+                                <div><span style="color:#888; font-size:0.75rem; display:block;">CHA</span><strong id="det-cha" style="font-size: 1.2rem;">-</strong></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px;">
+                            <h4 style="color: #9C27B0; margin: 0 0 10px 0; font-size: 0.9rem; text-transform: uppercase;">Expediente Profundo</h4>
+                            <div style="background-color: #1a1a24; padding: 15px; border-radius: 5px; font-size: 0.9rem; max-height: 250px; overflow-y: auto; border-left: 3px solid #9C27B0;">
+                                <p style="margin: 0 0 8px 0;"><strong style="color:#aaa;">Desglose Clases:</strong> <span id="detalle-clases-extra" style="color: #e0e0e0;">-</span></p>
+                                <p style="margin: 0 0 8px 0;"><strong style="color:#aaa;">Arma Principal:</strong> <span id="detalle-arma" style="color: #e0e0e0;">-</span></p>
+                                <p style="margin: 0 0 8px 0;"><strong style="color:#aaa;">Rasgos:</strong> <span id="detalle-rasgos" style="color: #e0e0e0;">-</span></p>
+                                <p style="margin: 0 0 8px 0;"><strong style="color:#aaa;">Motivaciones:</strong> <span id="detalle-motivaciones" style="color: #e0e0e0;">-</span></p>
+                                <p style="margin: 0 0 8px 0;"><strong style="color:#aaa;">Descripción:</strong> <span id="detalle-desc" style="color: #e0e0e0;">-</span></p>
+                                <p style="margin: 0;"><strong style="color:#aaa;">Otros/Inventario:</strong> <span id="detalle-otros" style="color: #FFEB3B;">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="vista-escuadrones" class="vista">
+            <div class="panel-acciones">
+                <h2 style="margin: 0; color: #FF9800;">Gestión de Batallones</h2>
+                <button onclick="abrirModal('modal-escuadron')" class="btn-accion naranja">+ Formar Nuevo Escuadrón</button>
+            </div>
+            <div id="contenedor-escuadrones" class="grid-escuadrones" style="margin-top: 20px;">
+                <p style="color: #aaa;">Cargando formaciones...</p>
+            </div>
+        </div>
+
+        <div id="vista-misiones" class="vista">
+            <div class="panel-acciones" style="border-top: 5px solid #F44336;">
+                <h2 style="margin: 0; color: #F44336;">Tablero de Contratos</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="abrirModal('modal-mision')" class="btn-accion rojo">+ Contrato Manual</button>
+                    <button onclick="generarMisionAleatoria()" class="btn-accion" style="background-color: #9C27B0;">✨ Auto-Generar Misión</button>
+                </div>
+            </div>
+            <div id="contenedor-misiones" class="grid-escuadrones" style="margin-top: 20px;">
+                <p style="color: #aaa;">Buscando contratos activos...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="modal-soldado" class="modal">
+        <div class="contenido-modal" style="width: 700px; max-width: 90vw;">
+            <h2 style="color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Reclutar / Ficha D&D</h2>
+            <form id="formulario-soldado">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <div class="grupo-input"><label>Nombre Real:</label><input type="text" id="input-nombre" required></div>
+                        <div class="grupo-input"><label>Nombre Clave:</label><input type="text" id="input-clave"></div>
+                        <div class="grupo-input"><label>Rango Militar:</label><input type="text" id="input-rango" required></div>
+                        <div class="grupo-input"><label>Clase Base (Ej: Warlock/Sorcerer):</label><input type="text" id="input-clase" required></div>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="grupo-input" style="flex: 1;"><label>Nivel (CR):</label><input type="number" id="input-nivel" min="1" max="20" value="1" required></div>
+                            <div class="grupo-input" style="flex: 1;"><label>Género:</label><select id="input-genero"><option>Femenino</option><option>Masculino</option><option>Otro</option></select></div>
+                        </div>
+                        <div class="grupo-input"><label>Desglose (Ej: Warlock 4, Sorcerer 3):</label><input type="text" id="input-clases-extra"></div>
+                        <div class="grupo-input">
+                            <label>Facción Titular:</label>
+                            <select id="input-lider" required>
+                                <option value="William">William</option>
+                                <option value="Cazador">Cazador</option>
+                                <option value="Libres">Libres (Mercenarios)</option>
+                            </select>
+                        </div>
+                        <div class="grupo-input"><label>URL Foto:</label><input type="url" id="input-foto"></div>
+                    </div>
+
+                    <div>
+                        <div class="grupo-input"><label>Alineamiento:</label><input type="text" id="input-alineamiento" placeholder="Ej: Legal Neutral"></div>
+                        <div class="grupo-input"><label>Arma Principal:</label><input type="text" id="input-arma"></div>
+                        
+                        <div class="grupo-input" style="background-color: #323245; padding: 10px; border-radius: 5px;">
+                            <label style="color: #fff;">Estado de Salud:</label>
+                            <div style="display: flex; gap: 5px;">
+                                <select id="input-estado" style="flex: 1;">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Herido">Herido en Combate</option>
+                                </select>
+                                <input type="number" id="input-dias-herido" placeholder="Días" style="width: 70px;" title="Días inactivo por herida">
+                            </div>
+                        </div>
+
+                        <label style="color: #4CAF50; font-size: 0.9rem; display: block; margin-bottom: 5px; margin-top: 15px; font-weight: bold;">Atributos Base:</label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px;">
+                            <input type="number" id="inp-str" placeholder="STR" title="Fuerza (Str)" style="padding: 5px; text-align: center;">
+                            <input type="number" id="inp-dex" placeholder="DEX" title="Destreza (Dex)" style="padding: 5px; text-align: center;">
+                            <input type="number" id="inp-con" placeholder="CON" title="Constitución (Con)" style="padding: 5px; text-align: center;">
+                            <input type="number" id="inp-int" placeholder="INT" title="Inteligencia (Int)" style="padding: 5px; text-align: center;">
+                            <input type="number" id="inp-wis" placeholder="WIS" title="Sabiduría (Wis)" style="padding: 5px; text-align: center;">
+                            <input type="number" id="inp-cha" placeholder="CHA" title="Carisma (Cha)" style="padding: 5px; text-align: center;">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; border-top: 1px solid #3f3f5a; padding-top: 15px;">
+                    <div class="grupo-input"><label>Rasgos de Personalidad:</label><input type="text" id="input-rasgos"></div>
+                    <div class="grupo-input"><label>Motivaciones:</label><input type="text" id="input-motivaciones"></div>
+                    <div class="grupo-input"><label>Descripción / Historia:</label><textarea id="input-desc" rows="2" style="width: 100%; background-color: #1a1a24; border: 1px solid #3f3f5a; color: white; padding: 8px; border-radius: 4px; box-sizing: border-box;"></textarea></div>
+                    <div class="grupo-input"><label>Otros (Ej: Objetos clave, traumas):</label><input type="text" id="input-otros"></div>
+                </div>
+
+                <div class="botones-modal" style="margin-top: 20px;">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-soldado')">Cancelar</button>
+                    <button type="submit" class="btn-accion">Guardar Personaje</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-escuadron" class="modal">
+        <div class="contenido-modal" style="border-top: 5px solid #FF9800;">
+            <h2 style="color: #FF9800;">Formar Escuadrón</h2>
+            <form id="formulario-escuadron">
+                <div class="grupo-input"><label>Nombre (Ej: Alpha-1):</label><input type="text" id="input-nombre-esc" required></div>
+                <div class="grupo-input">
+                    <label>Facción Titular:</label>
+                    <select id="input-faccion-esc" required>
+                        <option value="William">William</option>
+                        <option value="Cazador">Cazador</option>
+                        <option value="Libres">Libres</option>
+                    </select>
+                </div>
+                <div class="botones-modal">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-escuadron')">Cancelar</button>
+                    <button type="submit" class="btn-accion naranja">Formar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-gestionar" class="modal">
+        <div class="contenido-modal" style="width: 500px; border-top: 5px solid #2196F3;">
+            <h2 style="color: #2196F3;" id="gestion-titulo">Gestionar Escuadrón</h2>
+            
+            <div class="grupo-input">
+                <label>🎖️ Designar Comandante:</label>
+                <div style="display: flex; gap: 10px;">
+                    <select id="select-comandante" style="flex: 1;"><option value="">Nadie asignado</option></select>
+                    <button id="btn-guardar-comandante" class="btn-accion pequeno">Guardar</button>
+                </div>
+            </div>
+
+            <label style="color: #aaa; font-size: 0.9rem;">Miembros Actuales:</label>
+            <div id="lista-miembros-activos" class="caja-gestion"></div>
+
+            <label style="color: #aaa; font-size: 0.9rem;">Reclutas Disponibles (Misma facción o Libres):</label>
+            <div id="lista-reclutas-disponibles" class="caja-gestion"></div>
+
+            <div class="botones-modal">
+                <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-gestionar')">Cerrar Panel</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="modal-editar-escuadron" class="modal">
+        <div class="contenido-modal">
+            <h2 style="color: #FF9800;">Ajustes del Escuadrón</h2>
+            <form id="formulario-editar-escuadron">
+                <div class="grupo-input">
+                    <label>Renombrar Escuadrón:</label>
+                    <input type="text" id="input-editar-nombre-esc" required>
+                </div>
+                <div class="botones-modal" style="justify-content: space-between;">
+                    <button type="button" class="btn-accion rojo" onclick="eliminarEscuadron()">Eliminar Escuadrón</button>
+                    <div>
+                        <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-editar-escuadron')">Cancelar</button>
+                        <button type="submit" class="btn-accion naranja">Guardar Nombre</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-mision" class="modal">
+        <div class="contenido-modal" style="border-top: 5px solid #F44336;">
+            <h2 style="color: #F44336;">Nuevo Contrato</h2>
+            <form id="formulario-mision">
+                <div class="grupo-input"><label>Título de la Misión:</label><input type="text" id="input-titulo-mision" required></div>
+                <div class="grupo-input"><label>Planeta / Zona:</label><input type="text" id="input-lugar-mision" required></div>
+                <div class="grupo-input">
+                    <label>Nivel de Peligro:</label>
+                    <select id="input-peligro-mision">
+                        <option value="Bajo">Bajo (Nvl 1-3)</option>
+                        <option value="Medio">Medio (Nvl 4-7)</option>
+                        <option value="Alto">Alto (Nvl 8-12)</option>
+                        <option value="Letal">Letal (Nvl 13+)</option>
+                    </select>
+                </div>
+                <div class="grupo-input"><label>Recompensa Base:</label><input type="text" id="input-recompensa-mision" required></div>
+                <div class="botones-modal">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-mision')">Cancelar</button>
+                    <button type="submit" class="btn-accion rojo">Publicar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-desplegar" class="modal">
+        <div class="contenido-modal" style="border-top: 5px solid #9C27B0; width: 450px;">
+            <h2 style="color: #9C27B0;">Desplegar Escuadrones</h2>
+            <p style="color: #aaa; font-size: 0.9rem;" id="despliegue-subtitulo">Asigna tropas a esta misión.</p>
+            
+            <form id="formulario-despliegue">
+                <div id="lista-check-escuadrones" class="caja-gestion" style="height: 200px; display: flex; flex-direction: column; gap: 10px;">
+                    </div>
+                <div class="botones-modal">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-desplegar')">Cancelar</button>
+                    <button type="submit" class="btn-accion" style="background-color: #9C27B0;">Confirmar Despliegue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function cambiarPestaña(idVista, btn) {
+            document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+            document.getElementById(idVista).classList.add('activa');
+            document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('activo'));
+            btn.classList.add('activo');
+        }
+        function abrirModal(idModal) { document.getElementById(idModal).style.display = 'flex'; }
+        function cerrarModal(idModal) { document.getElementById(idModal).style.display = 'none'; }
+    </script>
+
+    <script type="module">
+        // IMPORTANTE: Ahora importamos updateDoc y doc para poder modificar los registros
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOzxxL7Wca38_Oh_lN4yqzhaN9rp1H_Qk",
+            authDomain: "gestion-tropas-rpg.firebaseapp.com",
+            projectId: "gestion-tropas-rpg",
+            storageBucket: "gestion-tropas-rpg.firebasestorage.app",
+            messagingSenderId: "1080851851872",
+            appId: "1:1080851851872:web:76fcd7343b8c1365613105"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Variables Globales para mantener el estado de la aplicación
+        let soldadosData = [];
+        let escuadronesData = [];
+        let misionesData = []; 
+        let misionEnDespliegue = null;
+        let escuadronEnEdicion = null; // Guarda el ID del escuadrón que tenemos abierto en el modal
+
+        // --- FUNCIÓN MAESTRA DE CARGA ---
+        async function cargarTodo() {
+            try {
+                // 1. Descargar todos los soldados (GUARDAMOS EL ID DEL DOCUMENTO)
+                const s_snap = await getDocs(collection(db, "soldados"));
+                soldadosData = s_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // 2. Descargar todos los escuadrones (GUARDAMOS EL ID)
+                const e_snap = await getDocs(collection(db, "escuadrones"));
+                escuadronesData = e_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                renderizarBarracones();
+                renderizarEscuadrones();
+            } catch (error) { console.error("Error global de carga:", error); }
+        }
+
+        // --- RENDERIZADO BARRACONES ---
+        function renderizarBarracones() {
+            const listaDiv = document.getElementById('lista-tropas');
+            listaDiv.innerHTML = '';
+            
+            const porLider = { "William": [], "Cazador": [], "Libres": [] };
+            soldadosData.forEach(s => {
+                const faccion = s.lider || "Libres";
+                if (!porLider[faccion]) porLider[faccion] = [];
+                porLider[faccion].push(s);
+            });
+
+            for (const [faccion, soldados] of Object.entries(porLider)) {
+                if (soldados.length > 0) {
+                    const grupoDiv = document.createElement('div');
+                    grupoDiv.className = 'grupo-lider';
+                    grupoDiv.innerHTML = `<div class="cabecera-lider"><h3>Facción: ${faccion}</h3><span class="contador-tropas">${soldados.length}</span></div>`;
+                    
+                    const lista = document.createElement('div');
+                    lista.className = 'lista-tropas-lider';
+                    soldados.forEach(s => {
+                        const item = document.createElement('div');
+                        item.className = 'item-lista';
+                        // Si tiene escuadrón, mostramos un indicador visual
+                        const indicador = s.escuadron_id ? '🛡️ ' : '';
+                        item.innerHTML = `<h4>${indicador}${s.nombre || 'Desconocido'}</h4><p>${s.rango} | ${s.clase}</p>`;
+                        item.addEventListener('click', () => mostrarDetallesSoldado(s));
+                        lista.appendChild(item);
+                    });
+                    grupoDiv.appendChild(lista);
+                    listaDiv.appendChild(grupoDiv);
+                }
+            }
+        }
+
+        function mostrarDetallesSoldado(s) {
+            document.getElementById('tarjeta-vacia').style.display = 'none';
+            document.getElementById('tarjeta-soldado').style.display = 'block';
+            
+            // Header Info
+            document.getElementById('detalle-nombre').innerText = s.nombre || 'Desconocido';
+            document.getElementById('detalle-nombre-clave').innerText = s.nombre_clave ? `"${s.nombre_clave}"` : '';
+            document.getElementById('detalle-rango-clase').innerText = `${s.rango || 'Sin Rango'} | ${s.clase || 'Sin Clase'} (Nvl ${s.nivel || 1})`;
+            document.getElementById('detalle-foto').src = s.foto || 'https://via.placeholder.com/150x150/323245/888888?text=Sin+Foto';
+            
+            // Estado con Heridas
+            let estadoTexto = s.estado_actual || 'Activo';
+            if (s.estado_actual === 'Herido' && s.dias_herido) {
+                estadoTexto = `Herido (${s.dias_herido} días)`;
+                document.getElementById('detalle-estado').style.color = '#F44336';
+            } else {
+                document.getElementById('detalle-estado').style.color = '#4CAF50';
+            }
+            document.getElementById('detalle-estado').innerText = estadoTexto;
+            
+            // Facción y Escuadrón
+            document.getElementById('detalle-lider').innerText = s.lider || 'Libres';
+            let nombreEscuadron = "No asignado";
+            if (s.escuadron_id) {
+                const esc = escuadronesData.find(e => e.id === s.escuadron_id);
+                if(esc) nombreEscuadron = esc.nombre;
+            }
+            document.getElementById('detalle-escuadron').innerText = nombreEscuadron;
+            
+            // Atributos y Alineamiento
+            document.getElementById('detalle-alineamiento').innerText = s.alineamiento || 'N/A';
+            document.getElementById('det-str').innerText = s.atributos?.str || 10;
+            document.getElementById('det-dex').innerText = s.atributos?.dex || 10;
+            document.getElementById('det-con').innerText = s.atributos?.con || 10;
+            document.getElementById('det-int').innerText = s.atributos?.int || 10;
+            document.getElementById('det-wis').innerText = s.atributos?.wis || 10;
+            document.getElementById('det-cha').innerText = s.atributos?.cha || 10;
+
+            // Expediente Profundo
+            document.getElementById('detalle-clases-extra').innerText = s.clases_extra || 'N/A';
+            document.getElementById('detalle-arma').innerText = s.arma_principal || 'N/A';
+            document.getElementById('detalle-rasgos').innerText = s.rasgos || 'N/A';
+            document.getElementById('detalle-motivaciones').innerText = s.motivaciones || 'N/A';
+            document.getElementById('detalle-desc').innerText = s.descripcion || 'N/A';
+            document.getElementById('detalle-otros').innerText = s.otros || 'N/A';
+        }
+
+        // --- RENDERIZADO ESCUADRONES ---
+        function renderizarEscuadrones() {
+            const contenedor = document.getElementById('contenedor-escuadrones');
+            contenedor.innerHTML = '';
+            
+            if(escuadronesData.length === 0) {
+                contenedor.innerHTML = '<p style="color: #aaa; grid-column: 1 / -1;">No hay escuadrones formados.</p>'; 
+                return;
+            }
+
+            escuadronesData.forEach(esc => {
+                // Filtrar soldados que pertenecen a este escuadrón
+                const miembros = soldadosData.filter(s => s.escuadron_id === esc.id);
+                
+                // Buscar al comandante
+                const comandante = miembros.find(s => s.id === esc.comandante_id);
+                const textoComandante = comandante ? `Comandante: ${comandante.nombre}` : '⚠️ Sin Comandante';
+
+                let htmlMiembros = '<p style="color:#888; font-size:0.9rem;">Sin tropas asignadas</p>';
+                if(miembros.length > 0) {
+                    htmlMiembros = miembros.map(m => `
+                        <div class="miembro-miniatura">
+                            ${m.id === esc.comandante_id ? '⭐ ' : ''}${m.nombre} <span style="color:#aaa; font-size:0.8rem;">(${m.clase})</span>
+                        </div>
+                    `).join('');
+                }
+
+                const tarjeta = document.createElement('div');
+                tarjeta.className = 'tarjeta-escuadron';
+                tarjeta.innerHTML = `
+                    <h3>${esc.nombre}</h3>
+                    <span class="facci-etiqueta">Facción: ${esc.faccion}</span>
+                    <div class="cmd-etiqueta">${textoComandante}</div>
+                    <div class="lista-miembros-escuadron">${htmlMiembros}</div>
+                `;
+                
+
+const btnGestionar = document.createElement('button');
+                btnGestionar.className = 'btn-accion naranja';
+                btnGestionar.innerText = 'Gestionar Tropas';
+                btnGestionar.style.flex = '1'; // Obliga al botón naranja a usar todo el espacio sobrante
+                btnGestionar.onclick = () => abrirGestionEscuadron(esc);
+
+                const btnEditar = document.createElement('button');
+                btnEditar.className = 'btn-icono'; // Usamos la nueva clase cuadrada
+                btnEditar.innerText = '⚙️'; 
+                btnEditar.onclick = () => abrirEditarEscuadron(esc);
+
+                const divBotones = document.createElement('div');
+                divBotones.style.marginTop = 'auto'; // Empuja los botones siempre al fondo de la tarjeta
+                divBotones.style.paddingTop = '15px';
+                divBotones.style.display = 'flex'; // Alineación perfecta
+                divBotones.style.gap = '10px'; // Espacio exacto entre botones
+                
+                divBotones.appendChild(btnGestionar);
+                divBotones.appendChild(btnEditar);
+
+                tarjeta.appendChild(divBotones);
+                contenedor.appendChild(tarjeta);
+
+            });
+        }
+
+        // --- LÓGICA DE GESTIÓN DE ESCUADRÓN (EL NÚCLEO NUEVO) ---
+        window.abrirGestionEscuadron = (esc) => { // Hacemos la función accesible globalmente
+            escuadronEnEdicion = esc;
+            document.getElementById('gestion-titulo').innerText = `Gestionar: ${esc.nombre}`;
+            
+            // 1. Separar soldados
+            // Miembros Actuales: Los que tienen el ID de este escuadrón
+            const miembrosActuales = soldadosData.filter(s => s.escuadron_id === esc.id);
+            
+            // Reclutas Disponibles: No tienen escuadrón AND (Son de la misma facción OR son Libres)
+            const disponibles = soldadosData.filter(s => 
+                !s.escuadron_id && 
+                (s.lider === esc.faccion || s.lider === "Libres")
+            );
+
+            // 2. Renderizar Select de Comandante
+            const selectCmd = document.getElementById('select-comandante');
+            selectCmd.innerHTML = '<option value="">Nadie asignado</option>';
+            miembrosActuales.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.text = m.nombre;
+                if(esc.comandante_id === m.id) opt.selected = true;
+                selectCmd.appendChild(opt);
+            });
+
+            // 3. Renderizar Miembros Actuales
+            const divActivos = document.getElementById('lista-miembros-activos');
+            divActivos.innerHTML = '';
+            if(miembrosActuales.length === 0) divActivos.innerHTML = '<p style="color:#888;">Vacío</p>';
+            miembrosActuales.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'fila-tropa';
+                div.innerHTML = `<span>${m.id === esc.comandante_id ? '⭐ ' : ''}${m.nombre} (${m.rango})</span>`;
+                
+                const btnRemove = document.createElement('button');
+                btnRemove.className = 'btn-accion rojo pequeno';
+                btnRemove.innerText = 'X';
+                btnRemove.onclick = () => moverSoldado(m.id, null); // Null = Quitar del escuadrón
+                
+                div.appendChild(btnRemove);
+                divActivos.appendChild(div);
+            });
+
+            // 4. Renderizar Reclutas Disponibles
+            const divDisponibles = document.getElementById('lista-reclutas-disponibles');
+            divDisponibles.innerHTML = '';
+            if(disponibles.length === 0) divDisponibles.innerHTML = '<p style="color:#888;">No hay soldados elegibles libres.</p>';
+            disponibles.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'fila-tropa';
+                div.innerHTML = `<span>${m.nombre} <span style="color:#aaa;">(${m.lider})</span></span>`;
+                
+                const btnAdd = document.createElement('button');
+                btnAdd.className = 'btn-accion pequeno';
+                btnAdd.innerText = '+ Añadir';
+                btnAdd.onclick = () => moverSoldado(m.id, esc.id); // Asignar a este escuadrón
+                
+                div.appendChild(btnAdd);
+                divDisponibles.appendChild(div);
+            });
+
+            abrirModal('modal-gestionar');
+        };
+
+        // Función para Asignar/Remover soldados de la base de datos
+// Función para Asignar/Remover soldados de la base de datos
+async function moverSoldado(soldadoId, nuevoEscuadronId) {
+            // REGLA DE JUEGO: Límite de 4 soldados por escuadrón
+            if (nuevoEscuadronId !== null) {
+                const miembrosYaAsignados = soldadosData.filter(s => s.escuadron_id === nuevoEscuadronId);
+                if (miembrosYaAsignados.length >= 4) {
+                    alert("⚠️ CAPACIDAD MÁXIMA ALCANZADA: Los vehículos de transporte actuales solo admiten escuadrones de 4 soldados.");
+                    return; // Corta la ejecución aquí
+                }
+            }
+
+            try {
+                const soldadoRef = doc(db, "soldados", soldadoId);
+                await updateDoc(soldadoRef, { escuadron_id: nuevoEscuadronId });
+                
+                if (nuevoEscuadronId === null && escuadronEnEdicion.comandante_id === soldadoId) {
+                    const escRef = doc(db, "escuadrones", escuadronEnEdicion.id);
+                    await updateDoc(escRef, { comandante_id: null });
+                }
+
+                await cargarTodo();
+                const escActualizado = escuadronesData.find(e => e.id === escuadronEnEdicion.id);
+                abrirGestionEscuadron(escActualizado);
+            } catch(e) { console.error("Error moviendo tropa", e); }
+        }
+            
+        // Función para Guardar al Comandante
+        document.getElementById('btn-guardar-comandante').addEventListener('click', async () => {
+            const nuevoCmdId = document.getElementById('select-comandante').value;
+            try {
+                const escRef = doc(db, "escuadrones", escuadronEnEdicion.id);
+                // Si eligen "Nadie asignado", mandamos null
+                await updateDoc(escRef, { comandante_id: nuevoCmdId || null });
+                
+                await cargarTodo();
+                const escActualizado = escuadronesData.find(e => e.id === escuadronEnEdicion.id);
+                abrirGestionEscuadron(escActualizado);
+            } catch(e) { console.error("Error asignando comandante", e); }
+        });
+
+
+        // --- FORMULARIOS BÁSICOS ---
+        document.getElementById('formulario-soldado').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const nuevo = {
+                // Info Base
+                nombre: document.getElementById('input-nombre').value,
+                nombre_clave: document.getElementById('input-clave').value,
+                rango: document.getElementById('input-rango').value,
+                clase: document.getElementById('input-clase').value,
+                nivel: parseInt(document.getElementById('input-nivel').value) || 1,
+                clases_extra: document.getElementById('input-clases-extra').value,
+                genero: document.getElementById('input-genero').value,
+                foto: document.getElementById('input-foto').value,
+                lider: document.getElementById('input-lider').value,
+                escuadron_id: null,
+                
+                // Info D&D
+                alineamiento: document.getElementById('input-alineamiento').value,
+                arma_principal: document.getElementById('input-arma').value,
+                estado_actual: document.getElementById('input-estado').value,
+                dias_herido: document.getElementById('input-dias-herido').value,
+                atributos: {
+                    str: parseInt(document.getElementById('inp-str').value) || 10,
+                    dex: parseInt(document.getElementById('inp-dex').value) || 10,
+                    con: parseInt(document.getElementById('inp-con').value) || 10,
+                    int: parseInt(document.getElementById('inp-int').value) || 10,
+                    wis: parseInt(document.getElementById('inp-wis').value) || 10,
+                    cha: parseInt(document.getElementById('inp-cha').value) || 10
+                },
+                rasgos: document.getElementById('input-rasgos').value,
+                motivaciones: document.getElementById('input-motivaciones').value,
+                descripcion: document.getElementById('input-desc').value,
+                otros: document.getElementById('input-otros').value
+            };
+            await addDoc(collection(db, "soldados"), nuevo);
+            cerrarModal('modal-soldado');
+            e.target.reset();
+            cargarTodo(); 
+        });
+
+        document.getElementById('formulario-escuadron').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const nuevo = {
+                nombre: document.getElementById('input-nombre-esc').value,
+                faccion: document.getElementById('input-faccion-esc').value,
+                comandante_id: null
+            };
+            await addDoc(collection(db, "escuadrones"), nuevo);
+            cerrarModal('modal-escuadron');
+            e.target.reset();
+            cargarTodo(); 
+        });
+
+// --- LÓGICA DE EDICIÓN Y ELIMINACIÓN DE ESCUADRONES ---
+window.abrirEditarEscuadron = (esc) => {
+            escuadronEnEdicion = esc;
+            document.getElementById('input-editar-nombre-esc').value = esc.nombre;
+            abrirModal('modal-editar-escuadron');
+        };
+
+        // Guardar nuevo nombre
+        document.getElementById('formulario-editar-escuadron').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nuevoNombre = document.getElementById('input-editar-nombre-esc').value;
+            try {
+                await updateDoc(doc(db, "escuadrones", escuadronEnEdicion.id), { nombre: nuevoNombre });
+                cerrarModal('modal-editar-escuadron');
+                cargarTodo();
+            } catch(e) { console.error("Error renombrando:", e); }
+        });
+
+        // Eliminar escuadrón y liberar tropas
+        window.eliminarEscuadron = async () => {
+            if(!confirm(`¿Estás seguro de desmantelar "${escuadronEnEdicion.nombre}"? Los soldados volverán a los barracones.`)) return;
+
+            try {
+                // 1. Quitarle el escuadron_id a todos los miembros actuales para no dejarlos huérfanos
+                const miembros = soldadosData.filter(s => s.escuadron_id === escuadronEnEdicion.id);
+                for (let m of miembros) {
+                    await updateDoc(doc(db, "soldados", m.id), { escuadron_id: null });
+                }
+                
+                // 2. Eliminar el documento del escuadrón
+                await deleteDoc(doc(db, "escuadrones", escuadronEnEdicion.id));
+
+                cerrarModal('modal-editar-escuadron');
+                cargarTodo();
+            } catch(e) { console.error("Error eliminando:", e); alert("Hubo un error al desmantelar el escuadrón."); }
+        };
+
+        // --- LÓGICA DE MISIONES ---
+
+        // 1. Modificar cargarTodo() original para que también traiga misiones
+        const cargarTodoOriginal = cargarTodo;
+        cargarTodo = async () => {
+            await cargarTodoOriginal(); // Llama a lo que ya teníamos
+            try {
+                const m_snap = await getDocs(collection(db, "misiones"));
+                misionesData = m_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderizarMisiones();
+            } catch(e) { console.error("Error cargando misiones:", e); }
+        };
+
+        function renderizarMisiones() {
+            const contenedor = document.getElementById('contenedor-misiones');
+            contenedor.innerHTML = '';
+            
+            if(misionesData.length === 0) { contenedor.innerHTML = '<p style="color: #aaa; grid-column: 1 / -1;">No hay contratos activos.</p>'; return; }
+
+            misionesData.forEach(mision => {
+                const tarjeta = document.createElement('div');
+                tarjeta.className = 'tarjeta-escuadron';
+                tarjeta.style.borderTopColor = '#F44336'; 
+
+                // LÓGICA DE DIFICULTAD Y SOLDADOS
+                let nivelPromedio = 0;
+                let totalSoldados = 0;
+                let htmlAsignados = '<span style="color: #888;">Ningún escuadrón desplegado. PENDIENTE.</span>';
+                
+                if(mision.escuadrones && mision.escuadrones.length > 0) {
+                    const nombres = [];
+                    mision.escuadrones.forEach(idEsc => {
+                        const esc = escuadronesData.find(e => e.id === idEsc);
+                        if(esc) nombres.push(`[${esc.nombre}]`);
+                        
+                        // Sumar niveles de los soldados en este escuadrón
+                        const miembros = soldadosData.filter(s => s.escuadron_id === idEsc);
+                        miembros.forEach(m => {
+                            nivelPromedio += Number(m.nivel) || 1;
+                            totalSoldados++;
+                        });
+                    });
+                    htmlAsignados = `<span style="color: #9C27B0; font-weight:bold;">${nombres.join(', ')}</span>`;
+                }
+
+                if(totalSoldados > 0) nivelPromedio = (nivelPromedio / totalSoldados).toFixed(1);
+
+                // MATEMÁTICAS DE SUPERVIVENCIA PARA LOS DADOS (Si hay tropas)
+                let panelDados = '';
+                if(totalSoldados > 0) {
+                    const deltaNivel = nivelPromedio - mision.cr; // Positivo es bueno, negativo es malo
+                    
+                    // Éxito: Base 50% si los niveles son iguales. Sube/baja 5% por cada nivel de diferencia. Max 95%, Min 5%
+                    let exitoProb = Math.min(95, Math.max(5, 50 + (deltaNivel * 5)));
+                    
+                    // Heridas base según Rango
+                    const riesgoBase = {'E': 10, 'D': 20, 'C': 35, 'B': 50, 'A': 65, 'S': 80, 'SS': 95}[mision.rango] || 20;
+                    // Nivel superior mitiga el riesgo (2% por nivel), nivel inferior lo aumenta
+                    let heridaProb = Math.min(95, Math.max(5, riesgoBase - (deltaNivel * 2)));
+                    
+                    // Muerte es una fracción del riesgo de herida
+                    let muerteProb = Math.max(0, Math.floor(heridaProb / 5));
+
+                    panelDados = `
+                        <div style="background-color: #111118; padding: 10px; border-radius: 5px; margin-top: 15px; border-left: 3px solid #9C27B0;">
+                            <p style="margin: 0 0 5px 0; color: #fff; font-size: 0.9rem;">🎲 <b>MESA DE TIRADAS</b> (CR: ${mision.cr} vs Lvl: ${nivelPromedio})</p>
+                            <p style="margin: 0; font-size: 0.85rem; color: #4CAF50;">% Éxito del Objetivo: <b>${exitoProb.toFixed(0)}%</b> (Tirar 1d100)</p>
+                            <p style="margin: 0; font-size: 0.85rem; color: #FF9800;">% Riesgo de Heridas: <b>${heridaProb.toFixed(0)}%</b> por soldado</p>
+                            <p style="margin: 0; font-size: 0.85rem; color: #F44336;">% Riesgo de Muerte: <b>${muerteProb.toFixed(0)}%</b> por soldado</p>
+                        </div>
+                    `;
+                }
+
+                tarjeta.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3 style="color: #F44336; margin: 0 0 5px 0;">${mision.titulo}</h3>
+                        <span style="background-color: #F44336; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold;">Rango ${mision.rango}</span>
+                    </div>
+                    <p style="margin: 5px 0; font-size: 0.85rem; color: #ccc;"><i>${mision.descripcion}</i></p>
+                    
+                    <div class="datos-grid" style="margin-top: 15px; gap: 8px;">
+                        <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Planeta</span><span class="valor" style="font-size: 0.9rem;">${mision.lugar}</span></div>
+                        <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Nivel Desafío (CR)</span><span class="valor" style="font-size: 0.9rem;">${mision.cr}</span></div>
+                        <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Duración</span><span class="valor" style="font-size: 0.9rem;">${mision.dias} Días</span></div>
+                        <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Requisito S/SS</span><span class="valor" style="font-size: 0.9rem; color:#FF9800;">${mision.requisitoEspecial || 'Ninguno'}</span></div>
+                    </div>
+
+                    <div style="margin-top: 10px; font-size: 0.9rem;">
+                        <span style="color: #4CAF50;">💰 Base:</span> ${mision.recompensaBase} <br>
+                        <span style="color: #FFEB3B;">🎁 Extra:</span> ${mision.recompensaAdicional}
+                    </div>
+                    
+                    <div class="lista-miembros-escuadron" style="margin-top: 15px;">
+                        <p style="margin: 0 0 5px 0; font-size: 0.8rem; color:#aaa;">Fuerzas Desplegadas:</p>
+                        ${htmlAsignados}
+                    </div>
+                    
+                    ${panelDados}
+
+                    <button class="btn-accion rojo" style="margin-top: 15px;" onclick="abrirDespliegue('${mision.id}')">Asignar Escuadrones</button>
+                `;
+                contenedor.appendChild(tarjeta);
+            });
+        }
+
+        // Crear Misión Manual
+        document.getElementById('formulario-mision').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nueva = {
+                titulo: document.getElementById('input-titulo-mision').value,
+                lugar: document.getElementById('input-lugar-mision').value,
+                peligro: document.getElementById('input-peligro-mision').value,
+                recompensa: document.getElementById('input-recompensa-mision').value,
+                escuadrones: [] // Al inicio no hay escuadrones
+            };
+            await addDoc(collection(db, "misiones"), nueva);
+            cerrarModal('modal-mision');
+            e.target.reset();
+            cargarTodo();
+        });
+
+        // Simulador IA de Misiones Aleatorias
+// Simulador Avanzado de Misiones Aleatorias
+window.generarMisionAleatoria = async () => {
+            const planetasOuterRim = ["Tatooine", "Ryloth", "Mandalore", "Mustafar", "Lothal", "Geonosis", "Dathomir", "Kessel", "Endor", "Hoth", "Sullust", "Felucia", "Korriban"];
+            const operaciones = ["Extracción VIP", "Purga de Nido", "Infiltración en", "Asedio a instalación en", "Recuperación de datos en", "Sabotaje industrial en"];
+            const descripciones = [
+                "Las fuerzas hostiles han fortificado la zona. Se requiere sigilo o fuerza bruta extrema.",
+                "Se detectó una anomalía biológica en el sector. Posible amenaza mutante.",
+                "Un informante tiene códigos críticos. Debemos sacarlo antes de que lo ejecuten.",
+                "Sindicatos criminales están operando una red de contrabando. Debemos desmantelarla."
+            ];
+            
+            // 1. Planeta y Título
+            const lugar = planetasOuterRim[Math.floor(Math.random() * planetasOuterRim.length)];
+            const titulo = `${operaciones[Math.floor(Math.random() * operaciones.length)]} ${lugar}`;
+            const descripcion = descripciones[Math.floor(Math.random() * descripciones.length)];
+
+            // 2. Calcular Rango (E a SS) con sus % de aparición
+            const rnd = Math.random();
+            let rango = 'E';
+            if (rnd < 0.01) rango = 'SS';      // 1%
+            else if (rnd < 0.06) rango = 'S';  // 5%
+            else if (rnd < 0.15) rango = 'A';  // 9%
+            else if (rnd < 0.30) rango = 'B';  // 15%
+            else if (rnd < 0.60) rango = 'C';  // 30%
+            else if (rnd < 0.90) rango = 'D';  // 30%
+
+            // 3. CR (1-20), Días (1-14) y Requisitos Especiales
+            const cr = Math.floor(Math.random() * 20) + 1;
+            const dias = Math.floor(Math.random() * 14) + 1;
+            const requisitoEspecial = (rango === 'S' || rango === 'SS') ? ["Hackeo Cuántico", "Poder de la Fuerza", "Navegación en Agujeros Negros", "Inmunidad Tóxica"][Math.floor(Math.random() * 4)] : "";
+
+            // 4. Recompensas Base y Extras
+            const recompensaBase = `${cr * (Math.floor(Math.random() * 500) + 500)} Créditos`;
+            const extras = ["Vehículo Ligero", "Alijo de Cristales Kyber", "Planos de Tecnología Imperial", "Artefacto Antiguo", "1 Nuevo Recluta Élite", "Control del Sector"];
+            const probExtra = { 'E': 0, 'D': 5, 'C': 15, 'B': 30, 'A': 50, 'S': 80, 'SS': 100 }[rango];
+            const recompensaAdicional = (Math.random() * 100 <= probExtra) ? extras[Math.floor(Math.random() * extras.length)] : "Ninguna";
+
+            await addDoc(collection(db, "misiones"), { 
+                titulo, lugar, descripcion, rango, cr, dias, requisitoEspecial, 
+                recompensaBase, recompensaAdicional, escuadrones: [] 
+            });
+            cargarTodo();
+        };
+
+        // Lógica de Despliegue (Asignar Escuadrones a Misión)
+        window.abrirDespliegue = (idMision) => {
+            misionEnDespliegue = misionesData.find(m => m.id === idMision);
+            document.getElementById('despliegue-subtitulo').innerText = `Contrato: ${misionEnDespliegue.titulo}`;
+            
+            const listaCheck = document.getElementById('lista-check-escuadrones');
+            listaCheck.innerHTML = '';
+
+            if (escuadronesData.length === 0) {
+                listaCheck.innerHTML = '<p style="color:#888;">No tienes escuadrones formados.</p>';
+            } else {
+                escuadronesData.forEach(esc => {
+                    const asignadoPrevio = misionEnDespliegue.escuadrones && misionEnDespliegue.escuadrones.includes(esc.id);
+                    listaCheck.innerHTML += `
+                        <label style="display: flex; align-items: center; gap: 10px; background-color: #252533; padding: 10px; border-radius: 5px; cursor: pointer;">
+                            <input type="checkbox" name="escuadron_check" value="${esc.id}" ${asignadoPrevio ? 'checked' : ''} style="width: 20px; height: 20px;">
+                            ${esc.nombre} <span style="color:#aaa; font-size: 0.8rem;">(Facción: ${esc.faccion})</span>
+                        </label>
+                    `;
+                });
+            }
+            abrirModal('modal-desplegar');
+        };
+
+        document.getElementById('formulario-despliegue').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Recolectar todos los checkboxes seleccionados
+            const seleccionados = Array.from(document.querySelectorAll('input[name="escuadron_check"]:checked')).map(cb => cb.value);
+            
+            try {
+                await updateDoc(doc(db, "misiones", misionEnDespliegue.id), { escuadrones: seleccionados });
+                cerrarModal('modal-desplegar');
+                cargarTodo();
+            } catch(e) { console.error("Error desplegando:", e); }
+        });
+
+        // Al cargar la página, descargamos toda la info
+        cargarTodo();
+    </script>
+</body>
+</html>
