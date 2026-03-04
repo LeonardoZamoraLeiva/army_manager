@@ -37,7 +37,10 @@
                 <div id="columna-lista"><div id="lista-tropas">Cargando personal...</div></div>
                 <div id="columna-detalle">
                     <div id="tarjeta-vacia" style="text-align: center; color: #888; margin-top: 50px;">Selecciona un recluta.</div>
-                    <div id="tarjeta-soldado" class="tarjeta-soldado" style="position: relative;">
+                    
+                    <div id="tarjeta-soldado" class="tarjeta-soldado" style="display: none; position: relative;">
+                        <button id="btn-editar-soldado-detalle" class="btn-accion" style="position: absolute; top: 15px; right: 15px; background-color: #555; padding: 5px 10px; z-index: 10;">⚙️ Editar Ficha</button>
+                        
                         <div class="cabecera-tarjeta">
                             <img id="detalle-foto" class="foto-soldado" src="" alt="Foto">
                             <div class="info-principal">
@@ -272,7 +275,7 @@
         <option value="Libres"></option>
     </datalist>
 
-    <div id="modal-soldado" class="modal">
+<div id="modal-soldado" class="modal">
         <div class="contenido-modal datapad-container" style="width: 750px; max-width: 95vw;">
             <h2 style="color: #4CAF50; margin-top: 0; text-transform: uppercase; letter-spacing: 2px;">Terminal de Registro Militar</h2>
             
@@ -349,6 +352,86 @@
         </div>
     </div>
 
+<div id="modal-editar-soldado" class="modal">
+        <div class="contenido-modal datapad-container" style="width: 750px; max-width: 95vw; border-color: #FF9800 !important; border-top-color: #FF9800 !important; box-shadow: 0 0 30px rgba(255, 152, 0, 0.15) !important;">
+            <h2 style="color: #FF9800; margin-top: 0; text-transform: uppercase; letter-spacing: 2px;">Modificar Expediente Militar</h2>
+            
+            <div class="datapad-nav" style="border-bottom-color: #5c3a00;">
+                <button type="button" class="btn-dp-tab activo" onclick="cambiarTabDatapad('dp-edit-personal', this)">👤 Datos Personales</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-edit-combate', this)">⚔️ Perfil de Combate</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-edit-expediente', this)">📁 Expediente y Lore</button>
+            </div>
+
+            <form id="formulario-editar-soldado">
+                <div id="dp-edit-personal" class="dp-seccion" style="display: block;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="grupo-input"><label>Nombre Real:</label><input type="text" id="edit-soldado-nombre" required></div>
+                            <div class="grupo-input"><label>Nombre Clave:</label><input type="text" id="edit-soldado-clave"></div>
+                            <div class="grupo-input"><label>Rango Militar:</label><input type="text" id="edit-soldado-rango" required></div>
+                            <div class="grupo-input"><label>Género:</label><select id="edit-soldado-genero"><option>Femenino</option><option>Masculino</option><option>Otro</option></select></div>
+                        </div>
+                        <div>
+                            <div class="grupo-input"><label>Facción Titular:</label><input type="text" id="edit-soldado-lider" list="lista-facciones" required></div>
+                            <div class="grupo-input"><label>URL Fotografía:</label><input type="url" id="edit-soldado-foto"></div>
+                            
+                            <div class="grupo-input" style="background-color: #1a1a24; padding: 15px; border-radius: 5px; border-left: 3px solid #F44336; margin-top: 15px;">
+                                <label style="color: #fff;">Estado de Salud:</label>
+                                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                                    <select id="edit-soldado-estado" style="flex: 2;">
+                                        <option value="Activo">Activo y Operativo</option>
+                                        <option value="Herido">Herido en Combate</option>
+                                        <option value="KIA">Caído en Acción (KIA)</option>
+                                    </select>
+                                    <input type="number" id="edit-soldado-dias-herido" placeholder="Días" style="flex: 1;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dp-edit-combate" class="dp-seccion" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="grupo-input"><label>Clase Base:</label><input type="text" id="edit-soldado-clase" required></div>
+                            <div class="grupo-input"><label>Nivel General (CR Base):</label><input type="number" id="edit-soldado-nivel" min="1" max="20" required></div>
+                            <div class="grupo-input"><label>Desglose Clases:</label><input type="text" id="edit-soldado-clases-extra"></div>
+                            <div class="grupo-input"><label>Arma Preferida:</label><input type="text" id="edit-soldado-arma"></div>
+                        </div>
+                        <div style="background-color: #111118; padding: 15px; border-radius: 8px; border: 1px solid #3f3f5a;">
+                            <label style="color: #FF9800; font-size: 1rem; display: block; margin-bottom: 15px; text-transform: uppercase; text-align: center;">Escáner de Atributos</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">STR</label><input type="number" id="edit-str" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">DEX</label><input type="number" id="edit-dex" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">CON</label><input type="number" id="edit-con" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">INT</label><input type="number" id="edit-int" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">WIS</label><input type="number" id="edit-wis" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">CHA</label><input type="number" id="edit-cha" style="text-align: center; font-size: 1.2rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dp-edit-expediente" class="dp-seccion" style="display: none;">
+                    <div class="grupo-input"><label>Alineamiento Psicológico:</label><input type="text" id="edit-soldado-alineamiento"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="grupo-input"><label>Rasgos de Personalidad:</label><input type="text" id="edit-soldado-rasgos"></div>
+                        <div class="grupo-input"><label>Motivaciones Principales:</label><input type="text" id="edit-soldado-motivaciones"></div>
+                    </div>
+                    <div class="grupo-input"><label>Historia / Background:</label><textarea id="edit-soldado-desc" rows="3" style="width: 100%; background-color: #111118; border: 1px solid #3f3f5a; color: white; padding: 10px; border-radius: 4px; box-sizing: border-box;"></textarea></div>
+                    <div class="grupo-input"><label>Notas Adicionales:</label><input type="text" id="edit-soldado-otros"></div>
+                </div>
+
+                <div class="botones-modal" style="margin-top: 25px; border-top: 1px solid #1a1a24; padding-top: 15px; justify-content: space-between;">
+                    <button type="button" class="btn-accion rojo" onclick="darDeBajaSoldado()">Licenciar (Eliminar Soldado)</button>
+                    <div>
+                        <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-editar-soldado')">Cancelar</button>
+                        <button type="submit" class="btn-accion naranja" style="font-size: 1.1rem; padding: 10px 20px;">💾 Guardar Cambios</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 <div id="modal-escuadron" class="modal">
         <div class="contenido-modal" style="border-top: 5px solid #FF9800;">
             <h2 style="color: #FF9800;">Formar Escuadrón</h2>
@@ -822,7 +905,109 @@
             document.getElementById('detalle-motivaciones').innerText = s.motivaciones || 'N/A';
             document.getElementById('detalle-desc').innerText = s.descripcion || 'N/A';
             document.getElementById('detalle-otros').innerText = s.otros || 'N/A';
+
+        // Conectar el botón de editar al soldado actual
+            document.getElementById('btn-editar-soldado-detalle').onclick = () => abrirEditarSoldado(s.id);     
+
         }
+
+// --- LÓGICA PARA EDITAR Y ELIMINAR SOLDADOS ---
+        let soldadoEnEdicionGlobal = null;
+
+        window.abrirEditarSoldado = (id) => {
+            const s = soldadosData.find(sold => sold.id === id);
+            soldadoEnEdicionGlobal = s;
+            
+            // Pestaña Personal
+            document.getElementById('edit-soldado-nombre').value = s.nombre || '';
+            document.getElementById('edit-soldado-clave').value = s.nombre_clave || '';
+            document.getElementById('edit-soldado-rango').value = s.rango || '';
+            document.getElementById('edit-soldado-genero').value = s.genero || 'Masculino';
+            document.getElementById('edit-soldado-lider').value = s.lider || 'Libres';
+            document.getElementById('edit-soldado-foto').value = s.foto || '';
+            document.getElementById('edit-soldado-estado').value = s.estado_actual || 'Activo';
+            document.getElementById('edit-soldado-dias-herido').value = s.dias_herido || '';
+            
+            // Pestaña Combate
+            document.getElementById('edit-soldado-clase').value = s.clase || '';
+            document.getElementById('edit-soldado-nivel').value = s.nivel || 1;
+            document.getElementById('edit-soldado-clases-extra').value = s.clases_extra || '';
+            document.getElementById('edit-soldado-arma').value = s.arma_principal || '';
+            document.getElementById('edit-str').value = s.atributos?.str || 10;
+            document.getElementById('edit-dex').value = s.atributos?.dex || 10;
+            document.getElementById('edit-con').value = s.atributos?.con || 10;
+            document.getElementById('edit-int').value = s.atributos?.int || 10;
+            document.getElementById('edit-wis').value = s.atributos?.wis || 10;
+            document.getElementById('edit-cha').value = s.atributos?.cha || 10;
+
+            // Pestaña Expediente
+            document.getElementById('edit-soldado-alineamiento').value = s.alineamiento || '';
+            document.getElementById('edit-soldado-rasgos').value = s.rasgos || '';
+            document.getElementById('edit-soldado-motivaciones').value = s.motivaciones || '';
+            document.getElementById('edit-soldado-desc').value = s.descripcion || '';
+            document.getElementById('edit-soldado-otros').value = s.otros || '';
+
+            abrirModal('modal-editar-soldado');
+        };
+
+        document.getElementById('formulario-editar-soldado').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const dataActualizada = {
+                nombre: document.getElementById('edit-soldado-nombre').value,
+                nombre_clave: document.getElementById('edit-soldado-clave').value,
+                rango: document.getElementById('edit-soldado-rango').value,
+                clase: document.getElementById('edit-soldado-clase').value,
+                nivel: parseInt(document.getElementById('edit-soldado-nivel').value) || 1,
+                clases_extra: document.getElementById('edit-soldado-clases-extra').value,
+                genero: document.getElementById('edit-soldado-genero').value,
+                foto: document.getElementById('edit-soldado-foto').value,
+                lider: document.getElementById('edit-soldado-lider').value,
+                alineamiento: document.getElementById('edit-soldado-alineamiento').value,
+                arma_principal: document.getElementById('edit-soldado-arma').value,
+                estado_actual: document.getElementById('edit-soldado-estado').value,
+                dias_herido: document.getElementById('edit-soldado-dias-herido').value,
+                atributos: {
+                    str: parseInt(document.getElementById('edit-str').value) || 10,
+                    dex: parseInt(document.getElementById('edit-dex').value) || 10,
+                    con: parseInt(document.getElementById('edit-con').value) || 10,
+                    int: parseInt(document.getElementById('edit-int').value) || 10,
+                    wis: parseInt(document.getElementById('edit-wis').value) || 10,
+                    cha: parseInt(document.getElementById('edit-cha').value) || 10
+                },
+                rasgos: document.getElementById('edit-soldado-rasgos').value,
+                motivaciones: document.getElementById('edit-soldado-motivaciones').value,
+                descripcion: document.getElementById('edit-soldado-desc').value,
+                otros: document.getElementById('edit-soldado-otros').value
+            };
+
+            try {
+                await updateDoc(doc(db, "soldados", soldadoEnEdicionGlobal.id), dataActualizada);
+                cerrarModal('modal-editar-soldado');
+                await cargarTodo();
+                // Actualizar la vista automáticamente sin necesidad de volver a hacer clic
+                const soldadoRefrescado = soldadosData.find(s => s.id === soldadoEnEdicionGlobal.id);
+                if (soldadoRefrescado) mostrarDetallesSoldado(soldadoRefrescado);
+            } catch(e) { console.error("Error editando soldado:", e); }
+        });
+
+        window.darDeBajaSoldado = async () => {
+            if(!confirm(`¿Estás seguro de licenciar y dar de baja a ${soldadoEnEdicionGlobal.nombre}? Esta acción es irreversible.`)) return;
+            try {
+                // Si el soldado está en un escuadrón o es comandante, hay que desvincularlo primero
+                if (soldadoEnEdicionGlobal.escuadron_id) {
+                    const esc = escuadronesData.find(e => e.id === soldadoEnEdicionGlobal.escuadron_id);
+                    if (esc && esc.comandante_id === soldadoEnEdicionGlobal.id) {
+                        await updateDoc(doc(db, "escuadrones", esc.id), { comandante_id: null });
+                    }
+                }
+                
+                await deleteDoc(doc(db, "soldados", soldadoEnEdicionGlobal.id));
+                cerrarModal('modal-editar-soldado');
+                document.getElementById('tarjeta-soldado').style.display = 'none';
+                document.getElementById('tarjeta-vacia').style.display = 'block';
+                cargarTodo();
+            } catch(e) { console.error("Error eliminando soldado:", e); }
+        };
 
         // --- RENDERIZADO ESCUADRONES ---
 // --- RENDERIZADO DE ESCUADRONES (NUEVO VISUAL) ---
