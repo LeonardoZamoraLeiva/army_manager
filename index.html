@@ -8,8 +8,15 @@
 </head>
 <body>
 
-    <header class="cabecera-principal">
-        <h1>Asociación de Cazadores</h1>
+<header class="cabecera-principal" style="position: relative;">
+        <h1>Comando Central</h1>
+        
+        <div style="position: absolute; right: 20px; top: 20px;">
+            <button id="btn-abrir-login" class="btn-accion pequeno" style="background-color: #555;">Acceso Comandante</button>
+            <button id="btn-logout" class="btn-accion rojo pequeno" style="display: none;">Desconectar</button>
+            <span id="estado-comandante" style="color: #4CAF50; font-size: 0.8rem; display: none; margin-left: 10px;">🟢 Conectado</span>
+        </div>
+
         <div class="menu-navegacion">
             <button class="btn-tab activo" onclick="cambiarPestaña('vista-barracones', this)">🛡️ Barracones (Personal)</button>
             <button class="btn-tab" onclick="cambiarPestaña('vista-escuadrones', this)">⚔️ Escuadrones</button>
@@ -255,6 +262,21 @@
         </div>
     </div>
 
+    <div id="modal-login" class="modal">
+        <div class="contenido-modal" style="width: 300px; border-top: 5px solid #555;">
+            <h2 style="color: #aaa;">Identificación</h2>
+            <form id="formulario-login">
+                <div class="grupo-input"><label>Correo:</label><input type="email" id="login-email" required></div>
+                <div class="grupo-input"><label>Contraseña:</label><input type="password" id="login-password" required></div>
+                <p id="login-error" style="color: #F44336; font-size: 0.8rem; display: none;">Credenciales inválidas.</p>
+                <div class="botones-modal">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-login')">Cancelar</button>
+                    <button type="submit" class="btn-accion">Acceder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="modal-desplegar" class="modal">
         <div class="contenido-modal" style="border-top: 5px solid #9C27B0; width: 450px;">
             <h2 style="color: #9C27B0;">Desplegar Escuadrones</h2>
@@ -286,6 +308,7 @@
         // IMPORTANTE: Ahora importamos updateDoc y doc para poder modificar los registros
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBOzxxL7Wca38_Oh_lN4yqzhaN9rp1H_Qk",
@@ -298,6 +321,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         // Variables Globales para mantener el estado de la aplicación
         let soldadosData = [];
@@ -866,6 +890,48 @@ window.generarMisionAleatoria = async () => {
             } catch(e) { console.error("Error desplegando:", e); }
         });
 
+        // --- LÓGICA DE AUTENTICACIÓN ---
+        document.getElementById('btn-abrir-login').addEventListener('click', () => abrirModal('modal-login'));
+        
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await signOut(auth);
+            alert("Sesión cerrada. Permisos de Comandante revocados.");
+        });
+
+        document.getElementById('formulario-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = "Verificando...";
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                cerrarModal('modal-login');
+                document.getElementById('login-error').style.display = 'none';
+                e.target.reset();
+            } catch(err) {
+                console.error("Error login", err);
+                document.getElementById('login-error').style.display = 'block';
+            } finally {
+                btn.innerText = "Acceder";
+            }
+        });
+
+        // Este observador vigila si estás conectado o no y cambia los botones
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Está conectado
+                document.getElementById('btn-abrir-login').style.display = 'none';
+                document.getElementById('btn-logout').style.display = 'inline-block';
+                document.getElementById('estado-comandante').style.display = 'inline-block';
+            } else {
+                // No está conectado
+                document.getElementById('btn-abrir-login').style.display = 'inline-block';
+                document.getElementById('btn-logout').style.display = 'none';
+                document.getElementById('estado-comandante').style.display = 'none';
+            }
+        });
         // Al cargar la página, descargamos toda la info
         cargarTodo();
     </script>
