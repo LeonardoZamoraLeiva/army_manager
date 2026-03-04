@@ -17,9 +17,11 @@
             <span id="estado-comandante" style="color: #4CAF50; font-size: 0.8rem; display: none; margin-left: 10px;">🟢 Conectado</span>
         </div>
 
-        <div class="menu-navegacion">
-            <button class="btn-tab activo" onclick="cambiarPestaña('vista-barracones', this)">🛡️ Barracones (Personal)</button>
+<div class="menu-navegacion">
+            <button class="btn-tab activo" onclick="cambiarPestaña('vista-barracones', this)">🛡️ Barracones</button>
             <button class="btn-tab" onclick="cambiarPestaña('vista-escuadrones', this)">⚔️ Escuadrones</button>
+            <button class="btn-tab" onclick="cambiarPestaña('vista-armeria', this)">🔫 Armería</button>
+            <button class="btn-tab" onclick="cambiarPestaña('vista-hangar', this)">🚀 Hangar</button>
             <button class="btn-tab" onclick="cambiarPestaña('vista-misiones', this)">🌍 Misiones</button>
         </div>
     </header>
@@ -80,13 +82,25 @@
             </div>
         </div>
 
-        <div id="vista-escuadrones" class="vista">
+<div id="vista-escuadrones" class="vista">
             <div class="panel-acciones">
                 <h2 style="margin: 0; color: #FF9800;">Gestión de Batallones</h2>
                 <button onclick="abrirModal('modal-escuadron')" class="btn-accion naranja">+ Formar Nuevo Escuadrón</button>
             </div>
-            <div id="contenedor-escuadrones" class="grid-escuadrones" style="margin-top: 20px;">
-                <p style="color: #aaa;">Cargando formaciones...</p>
+            
+            <div style="display: flex; gap: 20px; margin-top: 20px;">
+                <div style="flex: 1; background-color: #252533; border-radius: 8px; padding: 15px; height: fit-content; max-height: 700px; overflow-y: auto;">
+                    <div id="lista-escuadrones-nav">Cargando formaciones...</div>
+                </div>
+
+                <div style="flex: 2;">
+                    <div id="tarjeta-escuadron-vacia" style="text-align: center; color: #888; margin-top: 50px;">
+                        Selecciona un escuadrón en el panel izquierdo para ver su estructura.
+                    </div>
+                    
+                    <div id="detalle-escuadron-view" style="display: none; background-color: #252533; border-radius: 8px; padding: 25px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); border-top: 5px solid #FF9800;">
+                        </div>
+                </div>
             </div>
         </div>
 
@@ -103,7 +117,55 @@
             </div>
         </div>
 
-    </div>
+        <div id="vista-armeria" class="vista">
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 1;">
+                    <div class="panel-acciones" style="border-top: 5px solid #00BCD4; margin-bottom: 20px;">
+                        <h2 style="margin: 0; color: #00BCD4;">Inventario Base</h2>
+                        <button onclick="abrirModal('modal-equipo')" class="btn-accion" style="background-color: #00BCD4;">+ Forjar / Añadir Objeto</button>
+                    </div>
+                    <div id="lista-equipo" class="caja-gestion" style="height: 600px; overflow-y: auto;">
+                        <p style="color: #aaa;">Cargando inventario...</p>
+                    </div>
+                </div>
+
+                <div style="flex: 1; background-color: #252533; border-radius: 8px; padding: 20px; border-top: 5px solid #9C27B0;">
+                    <h2 style="margin-top: 0; color: #9C27B0;">Estación de Equipamiento</h2>
+                    
+                    <div class="grupo-input">
+                        <label>1. Selecciona un Escuadrón:</label>
+                        <select id="select-escuadron-armeria" onchange="cargarSoldadosArmeria()"><option value="">-- Elige un Escuadrón --</option></select>
+                    </div>
+                    
+                    <div class="grupo-input">
+                        <label>2. Selecciona un Soldado:</label>
+                        <select id="select-soldado-armeria" onchange="cargarSlotsArmeria()"><option value="">-- Esperando Escuadrón --</option></select>
+                    </div>
+
+                    <div id="panel-slots-equipo" style="display: none; margin-top: 20px; background-color: #1a1a24; padding: 15px; border-radius: 5px;">
+                        <h4 style="color: #4CAF50; margin-top: 0;">Slots de Combate</h4>
+                        <div class="grupo-input"><label>Arma (Melee o Rango):</label><select id="slot-arma"></select></div>
+                        <div class="grupo-input"><label>Armadura:</label><select id="slot-armadura"></select></div>
+                        <div class="grupo-input"><label>Objeto de Utilidad 1:</label><select id="slot-util1"></select></div>
+                        <div class="grupo-input"><label>Objeto de Utilidad 2:</label><select id="slot-util2"></select></div>
+                        
+                        <button onclick="guardarEquipamiento()" class="btn-accion" style="width: 100%; margin-top: 10px; background-color: #4CAF50;">💾 Confirmar y Asignar Equipamiento</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="vista-hangar" class="vista">
+            <div class="panel-acciones" style="border-top: 5px solid #795548; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #795548;">Hangar Motorizado</h2>
+                <button onclick="abrirModal('modal-vehiculo')" class="btn-accion" style="background-color: #795548;">+ Registrar Vehículo</button>
+            </div>
+            <div id="lista-vehiculos" class="grid-escuadrones">
+                <p style="color: #aaa;">Cargando vehículos...</p>
+            </div>
+        </div>
+
+        </div>
 
     <div id="modal-soldado" class="modal">
         <div class="contenido-modal" style="width: 700px; max-width: 90vw;">
@@ -173,23 +235,16 @@
         </div>
     </div>
 
-    <div id="modal-escuadron" class="modal">
+<div id="modal-escuadron" class="modal">
         <div class="contenido-modal" style="border-top: 5px solid #FF9800;">
             <h2 style="color: #FF9800;">Formar Escuadrón</h2>
             <form id="formulario-escuadron">
                 <div class="grupo-input"><label>Nombre (Ej: Alpha-1):</label><input type="text" id="input-nombre-esc" required></div>
-                <div class="grupo-input">
-                    <label>Facción Titular:</label>
-                    <select id="input-faccion-esc" required>
-                        <option value="William">William</option>
-                        <option value="Cazador">Cazador</option>
-                        <option value="Libres">Libres</option>
-                    </select>
-                </div>
-                <div class="botones-modal">
-                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-escuadron')">Cancelar</button>
-                    <button type="submit" class="btn-accion naranja">Formar</button>
-                </div>
+                <div class="grupo-input"><label>Facción Titular:</label><select id="input-faccion-esc" required><option value="William">William</option><option value="Cazador">Cazador</option><option value="Libres">Libres</option></select></div>
+                <div class="grupo-input"><label>Lema / Refrán (Opcional):</label><input type="text" id="input-lema-esc" placeholder="Ej: 'Primero entramos, últimos salimos'"></div>
+                <div class="grupo-input"><label>URL del Parche/Logo (Opcional):</label><input type="url" id="input-logo-esc" placeholder="https://ejemplo.com/logo.jpg"></div>
+                
+                <div class="botones-modal"><button type="button" class="btn-cancelar" onclick="cerrarModal('modal-escuadron')">Cancelar</button><button type="submit" class="btn-accion naranja">Formar</button></div>
             </form>
         </div>
     </div>
@@ -218,21 +273,17 @@
         </div>
     </div>
 
-
-    <div id="modal-editar-escuadron" class="modal">
+<div id="modal-editar-escuadron" class="modal">
         <div class="contenido-modal">
             <h2 style="color: #FF9800;">Ajustes del Escuadrón</h2>
             <form id="formulario-editar-escuadron">
-                <div class="grupo-input">
-                    <label>Renombrar Escuadrón:</label>
-                    <input type="text" id="input-editar-nombre-esc" required>
-                </div>
+                <div class="grupo-input"><label>Renombrar Escuadrón:</label><input type="text" id="input-editar-nombre-esc" required></div>
+                <div class="grupo-input"><label>Modificar Lema:</label><input type="text" id="input-editar-lema-esc"></div>
+                <div class="grupo-input"><label>Actualizar Logo (URL):</label><input type="url" id="input-editar-logo-esc"></div>
+                
                 <div class="botones-modal" style="justify-content: space-between;">
-                    <button type="button" class="btn-accion rojo" onclick="eliminarEscuadron()">Eliminar Escuadrón</button>
-                    <div>
-                        <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-editar-escuadron')">Cancelar</button>
-                        <button type="submit" class="btn-accion naranja">Guardar Nombre</button>
-                    </div>
+                    <button type="button" class="btn-accion rojo" onclick="eliminarEscuadron()">Disolver Escuadrón</button>
+                    <div><button type="button" class="btn-cancelar" onclick="cerrarModal('modal-editar-escuadron')">Cancelar</button><button type="submit" class="btn-accion naranja">Guardar</button></div>
                 </div>
             </form>
         </div>
@@ -293,6 +344,59 @@
         </div>
     </div>
 
+<div id="modal-equipo" class="modal">
+        <div class="contenido-modal" style="width: 400px; border-top: 5px solid #00BCD4;">
+            <h2 style="color: #00BCD4;">Añadir al Inventario</h2>
+            <form id="formulario-equipo">
+                <div class="grupo-input"><label>Nombre del Objeto:</label><input type="text" id="inp-eq-nombre" required></div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="grupo-input" style="flex: 2;"><label>Ranura:</label><select id="inp-eq-tipo"><option value="Arma">⚔️ Arma</option><option value="Armadura">🛡️ Armadura</option><option value="Utilidad">🎒 Utilidad</option></select></div>
+                    <div class="grupo-input" style="flex: 1;"><label>Stock:</label><input type="number" id="inp-eq-stock" value="1" min="1" required></div>
+                </div>
+                <div class="grupo-input"><label>Descripción / Efecto Narrativo:</label><input type="text" id="inp-eq-desc" required></div>
+                <div class="grupo-input" style="background-color: #323245; padding: 10px; border-radius: 5px;">
+                    <label style="color: #fff;">Aumento CR (Ej: 0.5, 1, 1.25):</label>
+                    <input type="number" id="inp-eq-cr" step="any" value="0" style="width: 100%; text-align: center; font-size: 1.2rem;">
+                </div>
+                <div class="botones-modal"><button type="button" class="btn-cancelar" onclick="cerrarModal('modal-equipo')">Cancelar</button><button type="submit" class="btn-accion" style="background-color: #00BCD4;">Guardar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-editar-equipo" class="modal">
+        <div class="contenido-modal" style="width: 400px; border-top: 5px solid #FF9800;">
+            <h2 style="color: #FF9800;">Modificar Objeto</h2>
+            <form id="formulario-editar-equipo">
+                <div class="grupo-input"><label>Nombre:</label><input type="text" id="edit-eq-nombre" required></div>
+                <div class="grupo-input"><label>Tipo:</label><select id="edit-eq-tipo"><option value="Arma">Arma</option><option value="Armadura">Armadura</option><option value="Utilidad">Utilidad</option></select></div>
+                <div class="grupo-input"><label>Descripción:</label><input type="text" id="edit-eq-desc" required></div>
+                <div class="grupo-input"><label>Aumento CR:</label><input type="number" id="edit-eq-cr" step="any" required></div>
+                <div class="botones-modal"><button type="button" class="btn-cancelar" onclick="cerrarModal('modal-editar-equipo')">Cancelar</button><button type="submit" class="btn-accion naranja">Guardar Cambios</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-vehiculo" class="modal">
+        <div class="contenido-modal" style="border-top: 5px solid #795548;">
+            <h2 style="color: #795548;">Nuevo Vehículo</h2>
+            <form id="formulario-vehiculo">
+                <div class="grupo-input"><label>Modelo / Nombre:</label><input type="text" id="inp-veh-nombre" required></div>
+                <div class="grupo-input"><label>Descripción / Armamento:</label><input type="text" id="inp-veh-desc" required></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <div class="grupo-input" style="margin:0;"><label>HP (Puntos de Casco):</label><input type="number" id="inp-veh-hp" value="50"></div>
+                    <div class="grupo-input" style="margin:0;"><label>AC (Blindaje):</label><input type="number" id="inp-veh-ac" value="15"></div>
+                    <div class="grupo-input" style="margin:0;"><label>Velocidad (ft):</label><input type="number" id="inp-veh-vel" value="60"></div>
+                    <div class="grupo-input" style="margin:0;"><label>Capacidad (Tropas):</label><input type="number" id="inp-veh-cap" value="4"></div>
+                </div>
+                <div class="botones-modal">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-vehiculo')">Cancelar</button>
+                    <button type="submit" class="btn-accion" style="background-color: #795548;">Aparcar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <script>
         function cambiarPestaña(idVista, btn) {
             document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
@@ -329,6 +433,8 @@
         let misionesData = []; 
         let misionEnDespliegue = null;
         let escuadronEnEdicion = null; // Guarda el ID del escuadrón que tenemos abierto en el modal
+        let equipoData = [];
+        let vehiculosData = [];
 
         // --- FUNCIÓN MAESTRA DE CARGA ---
         async function cargarTodo() {
@@ -429,67 +535,126 @@
         }
 
         // --- RENDERIZADO ESCUADRONES ---
+// --- RENDERIZADO DE ESCUADRONES (NUEVO VISUAL) ---
         function renderizarEscuadrones() {
-            const contenedor = document.getElementById('contenedor-escuadrones');
-            contenedor.innerHTML = '';
+            const contenedorNav = document.getElementById('lista-escuadrones-nav');
+            contenedorNav.innerHTML = '';
             
             if(escuadronesData.length === 0) {
-                contenedor.innerHTML = '<p style="color: #aaa; grid-column: 1 / -1;">No hay escuadrones formados.</p>'; 
+                contenedorNav.innerHTML = '<p style="color: #aaa;">No hay escuadrones formados.</p>'; 
                 return;
             }
 
+            // Construir la lista lateral
             escuadronesData.forEach(esc => {
-                // Filtrar soldados que pertenecen a este escuadrón
-                const miembros = soldadosData.filter(s => s.escuadron_id === esc.id);
-                
-                // Buscar al comandante
-                const comandante = miembros.find(s => s.id === esc.comandante_id);
-                const textoComandante = comandante ? `Comandante: ${comandante.nombre}` : '⚠️ Sin Comandante';
-
-                let htmlMiembros = '<p style="color:#888; font-size:0.9rem;">Sin tropas asignadas</p>';
-                if(miembros.length > 0) {
-                    htmlMiembros = miembros.map(m => `
-                        <div class="miembro-miniatura">
-                            ${m.id === esc.comandante_id ? '⭐ ' : ''}${m.nombre} <span style="color:#aaa; font-size:0.8rem;">(${m.clase})</span>
-                        </div>
-                    `).join('');
-                }
-
-                const tarjeta = document.createElement('div');
-                tarjeta.className = 'tarjeta-escuadron';
-                tarjeta.innerHTML = `
-                    <h3>${esc.nombre}</h3>
-                    <span class="facci-etiqueta">Facción: ${esc.faccion}</span>
-                    <div class="cmd-etiqueta">${textoComandante}</div>
-                    <div class="lista-miembros-escuadron">${htmlMiembros}</div>
-                `;
-                
-
-const btnGestionar = document.createElement('button');
-                btnGestionar.className = 'btn-accion naranja';
-                btnGestionar.innerText = 'Gestionar Tropas';
-                btnGestionar.style.flex = '1'; // Obliga al botón naranja a usar todo el espacio sobrante
-                btnGestionar.onclick = () => abrirGestionEscuadron(esc);
-
-                const btnEditar = document.createElement('button');
-                btnEditar.className = 'btn-icono'; // Usamos la nueva clase cuadrada
-                btnEditar.innerText = '⚙️'; 
-                btnEditar.onclick = () => abrirEditarEscuadron(esc);
-
-                const divBotones = document.createElement('div');
-                divBotones.style.marginTop = 'auto'; // Empuja los botones siempre al fondo de la tarjeta
-                divBotones.style.paddingTop = '15px';
-                divBotones.style.display = 'flex'; // Alineación perfecta
-                divBotones.style.gap = '10px'; // Espacio exacto entre botones
-                
-                divBotones.appendChild(btnGestionar);
-                divBotones.appendChild(btnEditar);
-
-                tarjeta.appendChild(divBotones);
-                contenedor.appendChild(tarjeta);
-
+                const item = document.createElement('div');
+                item.className = 'item-lista';
+                item.innerHTML = `<h4>${esc.nombre}</h4><p style="color:#FF9800;">${esc.faccion}</p>`;
+                item.addEventListener('click', () => mostrarDetallesEscuadron(esc));
+                contenedorNav.appendChild(item);
             });
         }
+
+        function mostrarDetallesEscuadron(esc) {
+            document.getElementById('tarjeta-escuadron-vacia').style.display = 'none';
+            const vista = document.getElementById('detalle-escuadron-view');
+            vista.style.display = 'block';
+
+            // Recolectar a las tropas
+            const miembros = soldadosData.filter(s => s.escuadron_id === esc.id);
+            const comandante = miembros.find(s => s.id === esc.comandante_id);
+            const tropasRestantes = miembros.filter(s => s.id !== esc.comandante_id);
+
+            // Generar HTML del Comandante (Si existe)
+            let htmlComandante = '';
+            if (comandante) {
+                const foto = comandante.foto || 'https://via.placeholder.com/150x150/323245/888888?text=Sin+Foto';
+                htmlComandante = `
+                    <div class="tarjeta-miembro-escuadron es-comandante">
+                        <span class="estrella-cmd">⭐</span>
+                        <img src="${foto}" class="foto-miniatura-tropa">
+                        <p class="nombre-tropa">${comandante.nombre}</p>
+                        <p class="clase-tropa">${comandante.clase} (Nvl ${comandante.nivel || 1})</p>
+                    </div>
+                `;
+            }
+
+            // Generar HTML del resto de la tropa (O de todos si no hay comandante)
+            let htmlTropas = '';
+            const tropasAMostrar = comandante ? tropasRestantes : miembros; // Si no hay comandante, van todos juntos
+            
+            if (tropasAMostrar.length === 0 && !comandante) {
+                htmlTropas = '<p style="color:#888; width: 100%; text-align: center;">Sin personal asignado.</p>';
+            } else {
+                tropasAMostrar.forEach(m => {
+                    const foto = m.foto || 'https://via.placeholder.com/150x150/323245/888888?text=Sin+Foto';
+                    htmlTropas += `
+                        <div class="tarjeta-miembro-escuadron">
+                            <img src="${foto}" class="foto-miniatura-tropa">
+                            <p class="nombre-tropa">${m.nombre}</p>
+                            <p class="clase-tropa">${m.clase} (Nvl ${m.nivel || 1})</p>
+                        </div>
+                    `;
+                });
+            }
+
+            // Datos base
+            const logo = esc.logo || 'https://via.placeholder.com/300x300/111118/FF9800?text=LOGO';
+            const lema = esc.lema ? `"${esc.lema}"` : '"A la espera de órdenes"';
+            const m_totales = esc.misiones_totales || 0;
+            const m_exito = esc.misiones_exito || 0;
+            const porcentaje = m_totales > 0 ? Math.round((m_exito / m_totales) * 100) : 0;
+
+            // Inyectar el Layout (Basado en tu dibujo)
+            vista.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="margin: 0 0 5px 0; color: #FF9800; font-size: 2.5rem;">${esc.nombre}</h2>
+                        <span style="background-color: #323245; padding: 4px 10px; border-radius: 12px; font-size: 0.9rem;">Facción: ${esc.faccion}</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-accion naranja" onclick="abrirGestionEscuadronObj('${esc.id}')">Gestionar Tropas</button>
+                        <button class="btn-accion" style="background-color: #555;" onclick="abrirEditarEscuadronObj('${esc.id}')">⚙️</button>
+                    </div>
+                </div>
+
+                <div class="layout-detalle-escuadron">
+                    <div class="columna-info-escuadron">
+                        <img src="${logo}" class="logo-escuadron" alt="Logo Escuadrón">
+                        <p class="lema-escuadron">${lema}</p>
+                        
+                        <div class="stats-escuadron">
+                            <p style="margin: 0 0 5px 0; color: #aaa; font-size: 0.9rem;">Misiones Superadas</p>
+                            <h3 style="margin: 0 0 15px 0; color: #4CAF50; font-size: 1.8rem;">${m_exito} / ${m_totales}</h3>
+                            <p style="margin: 0 0 5px 0; color: #aaa; font-size: 0.9rem;">Tasa de Éxito</p>
+                            <h3 style="margin: 0; color: #00BCD4; font-size: 1.5rem;">${porcentaje}%</h3>
+                        </div>
+                    </div>
+
+                    <div class="columna-tropas-escuadron">
+                        ${comandante ? `<div class="fila-comandante">${htmlComandante}</div>` : ''}
+                        <div class="fila-tropas">${htmlTropas}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- PEQUEÑOS ADAPTADORES PARA QUE LOS BOTONES FUNCIONEN CON LA NUEVA VISTA ---
+        window.abrirGestionEscuadronObj = (id) => {
+            const esc = escuadronesData.find(e => e.id === id);
+            if(esc) window.abrirGestionEscuadron(esc);
+        };
+        
+        window.abrirEditarEscuadronObj = (id) => {
+            const esc = escuadronesData.find(e => e.id === id);
+            if(esc) {
+                escuadronEnEdicion = esc;
+                document.getElementById('input-editar-nombre-esc').value = esc.nombre;
+                document.getElementById('input-editar-lema-esc').value = esc.lema || '';
+                document.getElementById('input-editar-logo-esc').value = esc.logo || '';
+                abrirModal('modal-editar-escuadron');
+            }
+        };
 
         // --- LÓGICA DE GESTIÓN DE ESCUADRÓN (EL NÚCLEO NUEVO) ---
         window.abrirGestionEscuadron = (esc) => { // Hacemos la función accesible globalmente
@@ -638,12 +803,16 @@ async function moverSoldado(soldadoId, nuevoEscuadronId) {
             cargarTodo(); 
         });
 
-        document.getElementById('formulario-escuadron').addEventListener('submit', async (e) => {
+document.getElementById('formulario-escuadron').addEventListener('submit', async (e) => {
             e.preventDefault(); 
             const nuevo = {
                 nombre: document.getElementById('input-nombre-esc').value,
                 faccion: document.getElementById('input-faccion-esc').value,
-                comandante_id: null
+                lema: document.getElementById('input-lema-esc').value,
+                logo: document.getElementById('input-logo-esc').value,
+                comandante_id: null,
+                misiones_totales: 0,
+                misiones_exito: 0
             };
             await addDoc(collection(db, "escuadrones"), nuevo);
             cerrarModal('modal-escuadron');
@@ -659,14 +828,24 @@ window.abrirEditarEscuadron = (esc) => {
         };
 
         // Guardar nuevo nombre
-        document.getElementById('formulario-editar-escuadron').addEventListener('submit', async (e) => {
+document.getElementById('formulario-editar-escuadron').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nuevoNombre = document.getElementById('input-editar-nombre-esc').value;
             try {
-                await updateDoc(doc(db, "escuadrones", escuadronEnEdicion.id), { nombre: nuevoNombre });
+                await updateDoc(doc(db, "escuadrones", escuadronEnEdicion.id), { 
+                    nombre: document.getElementById('input-editar-nombre-esc').value,
+                    lema: document.getElementById('input-editar-lema-esc').value,
+                    logo: document.getElementById('input-editar-logo-esc').value
+                });
                 cerrarModal('modal-editar-escuadron');
                 cargarTodo();
-            } catch(e) { console.error("Error renombrando:", e); }
+                // Opcional: Refrescar la vista actual para ver los cambios instantáneamente
+                const escActualizado = { ...escuadronEnEdicion, 
+                    nombre: document.getElementById('input-editar-nombre-esc').value,
+                    lema: document.getElementById('input-editar-lema-esc').value,
+                    logo: document.getElementById('input-editar-logo-esc').value 
+                };
+                mostrarDetallesEscuadron(escActualizado);
+            } catch(e) { console.error("Error editando:", e); }
         });
 
         // Eliminar escuadrón y liberar tropas
@@ -690,15 +869,25 @@ window.abrirEditarEscuadron = (esc) => {
 
         // --- LÓGICA DE MISIONES ---
 
-        // 1. Modificar cargarTodo() original para que también traiga misiones
+// 1. Modificar cargarTodo() original para que traiga Misiones, Equipo y Vehículos
         const cargarTodoOriginal = cargarTodo;
         cargarTodo = async () => {
-            await cargarTodoOriginal(); // Llama a lo que ya teníamos
+            await cargarTodoOriginal(); 
             try {
+                // Cargar Misiones
                 const m_snap = await getDocs(collection(db, "misiones"));
                 misionesData = m_snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderizarMisiones();
-            } catch(e) { console.error("Error cargando misiones:", e); }
+
+                // Cargar Arsenal
+                const eq_snap = await getDocs(collection(db, "equipo"));
+                equipoData = eq_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                
+                const v_snap = await getDocs(collection(db, "vehiculos"));
+                vehiculosData = v_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                
+                renderizarArsenal();
+            } catch(e) { console.error("Error en carga extendida:", e); }
         };
 
         function renderizarMisiones() {
@@ -724,9 +913,24 @@ window.abrirEditarEscuadron = (esc) => {
                         if(esc) nombres.push(`[${esc.nombre}]`);
                         
                         // Sumar niveles de los soldados en este escuadrón
+
                         const miembros = soldadosData.filter(s => s.escuadron_id === idEsc);
                         miembros.forEach(m => {
-                            nivelPromedio += Number(m.nivel) || 1;
+                            let nivelEfectivo = Number(m.nivel) || 1;
+                            
+                            // Buscar el equipo que tiene equipado y sumar su mod_cr
+                            if (m.equipo) {
+                                ['arma', 'armadura', 'util1', 'util2'].forEach(slot => {
+                                    if (m.equipo[slot]) {
+                                        const item = equipoData.find(eq => eq.id === m.equipo[slot]);
+                                        if (item && item.mod_cr) {
+                                            nivelEfectivo += Number(item.mod_cr);
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            nivelPromedio += nivelEfectivo;
                             totalSoldados++;
                         });
                     });
@@ -932,6 +1136,263 @@ window.generarMisionAleatoria = async () => {
                 document.getElementById('estado-comandante').style.display = 'none';
             }
         });
+
+// --- LÓGICA DE ARMERÍA Y HANGAR (ACTUALIZADA D&D) ---
+
+        // Variables para edición y equipamiento
+        let equipoEnEdicion = null;
+        let vehiculoEnEdicion = null;
+        let soldadoEquipandoseId = null;
+
+        function renderizarArsenal() {
+            // 1. Renderizar Lista Izquierda (Armería)
+            const divEquipo = document.getElementById('lista-equipo');
+            divEquipo.innerHTML = '';
+            if(equipoData.length === 0) divEquipo.innerHTML = '<p style="color:#888;">Armería vacía.</p>';
+            
+            equipoData.forEach(eq => {
+                const icono = eq.tipo === 'Armadura' ? '🛡️' : eq.tipo === 'Arma' ? '⚔️' : '🎒';
+                const modCrTexto = eq.mod_cr > 0 ? `+${eq.mod_cr}` : `${eq.mod_cr || 0}`;
+                const stockActual = eq.stock || 0;
+                const colorStock = stockActual > 0 ? '#4CAF50' : '#F44336';
+                
+                divEquipo.innerHTML += `
+                    <div class="fila-tropa" style="border-left: 3px solid #00BCD4; flex-direction: column; align-items: flex-start; margin-bottom: 10px; padding: 10px; position: relative;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                            <strong style="color: #fff;">${icono} ${eq.nombre}</strong>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-accion" style="background-color: #555; padding: 2px 8px;" onclick="abrirEditarEquipo('${eq.id}')" title="Editar">⚙️</button>
+                                <button class="btn-accion rojo" style="padding: 2px 8px;" onclick="eliminarObjeto('${eq.id}', 'equipo')" title="Eliminar">🗑️</button>
+                            </div>
+                        </div>
+                        <span style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">${eq.descripcion}</span>
+                        
+                        <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 10px; align-items: center;">
+                            <span style="font-size: 0.8rem; color: #9C27B0; font-weight: bold;">[Modificador: ${modCrTexto} CR]</span>
+                            
+                            <div style="display: flex; align-items: center; background-color: #1a1a24; border-radius: 4px; border: 1px solid #3f3f5a;">
+                                <button onclick="modificarStock('${eq.id}', -1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">-</button>
+                                <span style="color: ${colorStock}; font-weight: bold; padding: 0 10px; font-size: 0.9rem;">Stock: ${stockActual}</span>
+                                <button onclick="modificarStock('${eq.id}', 1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 2. Llenar Desplegable de Escuadrones en la Estación de Equipamiento
+            const selectEscuadron = document.getElementById('select-escuadron-armeria');
+            selectEscuadron.innerHTML = '<option value="">-- Elige un Escuadrón --</option>';
+            escuadronesData.forEach(esc => {
+                selectEscuadron.innerHTML += `<option value="${esc.id}">${esc.nombre}</option>`;
+            });
+
+            // 3. Renderizar Hangar de Vehículos (Tarjetas estilo Escuadrón)
+            const divVehiculos = document.getElementById('lista-vehiculos');
+            divVehiculos.innerHTML = '';
+            if(vehiculosData.length === 0) divVehiculos.innerHTML = '<p style="color:#aaa;">Hangar vacío.</p>';
+            
+            vehiculosData.forEach(veh => {
+                divVehiculos.innerHTML += `
+                    <div class="tarjeta-escuadron" style="border-top-color: #795548;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <h3 style="color: #795548; margin: 0 0 5px 0;">🚀 ${veh.nombre}</h3>
+                            <button class="btn-accion rojo pequeno" onclick="eliminarObjeto('${veh.id}', 'vehiculos')">🗑️</button>
+                        </div>
+                        <p style="margin: 5px 0; font-size: 0.85rem; color: #ccc;"><i>${veh.descripcion}</i></p>
+                        <div class="datos-grid" style="margin-top: 15px; gap: 8px;">
+                            <div class="dato-item" style="padding: 5px;"><span class="etiqueta">HP / AC</span><span class="valor" style="font-size: 0.9rem; color: #4CAF50;">${veh.hp} / ${veh.ac}</span></div>
+                            <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Velocidad</span><span class="valor" style="font-size: 0.9rem;">${veh.vel} ft</span></div>
+                            <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Capacidad</span><span class="valor" style="font-size: 0.9rem;">${veh.cap} Tropas</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- SISTEMA DE EQUIPAMIENTO (Selectores Encadenados) ---
+        window.cargarSoldadosArmeria = () => {
+            const idEscuadron = document.getElementById('select-escuadron-armeria').value;
+            const selectSoldado = document.getElementById('select-soldado-armeria');
+            const panelSlots = document.getElementById('panel-slots-equipo');
+            
+            selectSoldado.innerHTML = '<option value="">-- Elige un Soldado --</option>';
+            panelSlots.style.display = 'none'; // Ocultar panel hasta elegir soldado
+
+            if(!idEscuadron) return;
+
+            const miembros = soldadosData.filter(s => s.escuadron_id === idEscuadron);
+            miembros.forEach(m => {
+                selectSoldado.innerHTML += `<option value="${m.id}">${m.nombre} (${m.clase})</option>`;
+            });
+        };
+
+        window.cargarSlotsArmeria = () => {
+            soldadoEquipandoseId = document.getElementById('select-soldado-armeria').value;
+            const panelSlots = document.getElementById('panel-slots-equipo');
+            
+            if(!soldadoEquipandoseId) { panelSlots.style.display = 'none'; return; }
+            panelSlots.style.display = 'block';
+
+            const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
+            const equipoActual = soldado.equipo || { arma: '', armadura: '', util1: '', util2: '' };
+
+            // Función interna actualizada para validar Stock
+            const rellenarSelect = (idSelect, tipoRequerido, idEquipado) => {
+                const select = document.getElementById(idSelect);
+                select.innerHTML = '<option value="">-- Ninguno --</option>';
+                
+                const opciones = equipoData.filter(eq => eq.tipo === tipoRequerido);
+                opciones.forEach(eq => {
+                    const stock = eq.stock || 0;
+                    const isEquipped = eq.id === idEquipado;
+                    
+                    // Solo mostrar si hay stock, o si es el que ya tiene puesto
+                    if (stock > 0 || isEquipped) {
+                        const isSelected = isEquipped ? 'selected' : '';
+                        const textStock = isEquipped ? '(Equipado)' : `(Disp: ${stock})`;
+                        select.innerHTML += `<option value="${eq.id}" ${isSelected}>${eq.nombre} ${textStock}</option>`;
+                    }
+                });
+            };
+
+            rellenarSelect('slot-arma', 'Arma', equipoActual.arma);
+            rellenarSelect('slot-armadura', 'Armadura', equipoActual.armadura);
+            rellenarSelect('slot-util1', 'Utilidad', equipoActual.util1);
+            rellenarSelect('slot-util2', 'Utilidad', equipoActual.util2);
+        };
+
+// --- CEREBRO DE GESTIÓN DE STOCK Y EQUIPO ---
+
+        // 1. Guardar el Equipamiento y Ajustar Stocks (Reemplaza al auto-guardado)
+        window.guardarEquipamiento = async () => {
+            if(!soldadoEquipandoseId) return;
+            const btn = document.querySelector('#panel-slots-equipo button');
+            btn.innerText = "Calculando logística..."; btn.disabled = true;
+
+            const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
+            const eqViejo = soldado.equipo || {};
+            const eqNuevo = {
+                arma: document.getElementById('slot-arma').value,
+                armadura: document.getElementById('slot-armadura').value,
+                util1: document.getElementById('slot-util1').value,
+                util2: document.getElementById('slot-util2').value
+            };
+
+            // Calcular qué entró y qué salió del inventario
+            let cambiosStock = {}; // Formato: { "idObjeto": delta } (Ej: +1 si se desequipa, -1 si se equipa)
+            const slots = ['arma', 'armadura', 'util1', 'util2'];
+            
+            slots.forEach(slot => {
+                let idViejo = eqViejo[slot];
+                let idNuevo = eqNuevo[slot];
+                if (idViejo !== idNuevo) {
+                    if (idViejo) cambiosStock[idViejo] = (cambiosStock[idViejo] || 0) + 1; // Devuelve al inventario
+                    if (idNuevo) cambiosStock[idNuevo] = (cambiosStock[idNuevo] || 0) - 1; // Saca del inventario
+                }
+            });
+
+            try {
+                // Actualizar al Soldado
+                await updateDoc(doc(db, "soldados", soldadoEquipandoseId), { equipo: eqNuevo });
+                
+                // Actualizar los Stocks en Firebase
+                for (let [itemId, delta] of Object.entries(cambiosStock)) {
+                    let item = equipoData.find(e => e.id === itemId);
+                    if (item) {
+                        let nuevoStock = Math.max(0, (item.stock || 0) + delta);
+                        await updateDoc(doc(db, "equipo", itemId), { stock: nuevoStock });
+                    }
+                }
+                
+                alert("Equipamiento asignado. Armería actualizada.");
+                await cargarTodo(); 
+                // Restaurar vista
+                cargarSoldadosArmeria();
+                document.getElementById('select-soldado-armeria').value = soldadoEquipandoseId;
+                cargarSlotsArmeria();
+
+            } catch(e) { console.error("Error asignando:", e); }
+            finally { btn.innerText = "💾 Confirmar y Asignar Equipamiento"; btn.disabled = false; }
+        };
+
+        // 2. Modificación Rápida de Stock (+ / -)
+        window.modificarStock = async (id, delta) => {
+            const item = equipoData.find(e => e.id === id);
+            if(!item) return;
+            const nuevoStock = Math.max(0, (item.stock || 0) + delta);
+            try {
+                await updateDoc(doc(db, "equipo", id), { stock: nuevoStock });
+                await cargarTodo();
+            } catch(e) { console.error("Error stock:", e); }
+        };
+
+
+
+        // 4. Lógica para Editar Equipo Existente
+        window.abrirEditarEquipo = (id) => {
+            equipoEnEdicion = equipoData.find(e => e.id === id);
+            document.getElementById('edit-eq-nombre').value = equipoEnEdicion.nombre;
+            document.getElementById('edit-eq-tipo').value = equipoEnEdicion.tipo;
+            document.getElementById('edit-eq-desc').value = equipoEnEdicion.descripcion;
+            document.getElementById('edit-eq-cr').value = equipoEnEdicion.mod_cr || 0;
+            abrirModal('modal-editar-equipo');
+        };
+
+        document.getElementById('formulario-editar-equipo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await updateDoc(doc(db, "equipo", equipoEnEdicion.id), {
+                    nombre: document.getElementById('edit-eq-nombre').value,
+                    tipo: document.getElementById('edit-eq-tipo').value,
+                    descripcion: document.getElementById('edit-eq-desc').value,
+                    mod_cr: parseFloat(document.getElementById('edit-eq-cr').value) || 0
+                });
+                cerrarModal('modal-editar-equipo');
+                cargarTodo();
+            } catch(e) { console.error("Error editando:", e); }
+        });
+
+        // --- CREACIÓN Y ELIMINACIÓN DE OBJETOS/VEHÍCULOS ---
+        document.getElementById('formulario-equipo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nuevo = {
+                nombre: document.getElementById('inp-eq-nombre').value,
+                tipo: document.getElementById('inp-eq-tipo').value,
+                descripcion: document.getElementById('inp-eq-desc').value,
+                stock: parseInt(document.getElementById('inp-eq-stock').value) || 1,
+                mod_cr: parseFloat(document.getElementById('inp-eq-cr').value) || 0
+            };
+            await addDoc(collection(db, "equipo"), nuevo);
+            cerrarModal('modal-equipo');
+            e.target.reset();
+            cargarTodo();
+        });
+
+        document.getElementById('formulario-vehiculo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nuevo = {
+                nombre: document.getElementById('inp-veh-nombre').value,
+                descripcion: document.getElementById('inp-veh-desc').value,
+                hp: parseInt(document.getElementById('inp-veh-hp').value) || 0,
+                ac: parseInt(document.getElementById('inp-veh-ac').value) || 0,
+                vel: parseInt(document.getElementById('inp-veh-vel').value) || 0,
+                cap: parseInt(document.getElementById('inp-veh-cap').value) || 0
+            };
+            await addDoc(collection(db, "vehiculos"), nuevo);
+            cerrarModal('modal-vehiculo');
+            e.target.reset();
+            cargarTodo();
+        });
+
+        window.eliminarObjeto = async (id, coleccion) => {
+            if(!confirm("¿Destruir este objeto permanentemente?")) return;
+            try {
+                await deleteDoc(doc(db, coleccion, id));
+                cargarTodo();
+            } catch(e) { console.error("Error destruyendo:", e); }
+        };
+
         // Al cargar la página, descargamos toda la info
         cargarTodo();
     </script>

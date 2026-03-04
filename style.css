@@ -90,3 +90,103 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
     flex-shrink: 0; /* Evita que se aplaste */
 }
 .btn-icono:hover { background-color: #45a049; }
+
+/* --- ESTILOS DE ORGANIGRAMA DE ESCUADRÓN --- */
+.layout-detalle-escuadron {
+    display: flex;
+    gap: 30px;
+}
+
+.columna-info-escuadron {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-right: 2px dashed #3f3f5a;
+    padding-right: 20px;
+}
+
+/* El recorte en forma de pentágono que dibujaste */
+.logo-escuadron {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    background-color: #323245;
+    margin: 15px 0;
+    border: 3px solid #FF9800; /* No se ve el borde normal con clip-path, requiere trucos extra, pero el fondo ayuda */
+}
+
+.lema-escuadron {
+    font-style: italic;
+    color: #aaa;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.stats-escuadron {
+    background-color: #1a1a24;
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.columna-tropas-escuadron {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.fila-comandante {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.fila-tropas {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.tarjeta-miembro-escuadron {
+    background-color: #1a1a24;
+    border: 1px solid #3f3f5a;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    width: 120px;
+    position: relative;
+}
+
+.tarjeta-miembro-escuadron.es-comandante {
+    border-color: #FF9800;
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.2);
+    width: 140px;
+}
+
+.foto-miniatura-tropa {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-bottom: 8px;
+    background-color: #323245;
+}
+
+.es-comandante .foto-miniatura-tropa {
+    width: 100px;
+    height: 100px;
+    border: 2px solid #FF9800;
+}
+
+.nombre-tropa { font-size: 0.9rem; color: #fff; font-weight: bold; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.clase-tropa { font-size: 0.75rem; color: #888; margin: 0;}
+.estrella-cmd { position: absolute; top: -10px; right: -10px; font-size: 1.5rem; filter: drop-shadow(0 0 5px #000); }
