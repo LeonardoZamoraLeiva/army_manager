@@ -242,110 +242,205 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 
 
 /* --- ESTILOS INVENTARIO VISUAL (DIABLO STYLE) --- */
-.diablo-layout {
+
+/* --- DIABLO III INVENTORY SYSTEM --- */
+.d3-container {
     display: flex;
-    gap: 20px;
-    margin-top: 15px;
+    /* 1. FONDO PAPIRO ACTIVO (Con tinte oscuro para legibilidad) */
+    background: linear-gradient(rgba(30, 20, 15, 0.75), rgba(20, 10, 5, 0.85)), url('assets/fondoPapiro.png') center/cover;
+    
+    /* 2. PARA PROBAR EL FONDO MILITAR: Comenta la línea de arriba y descomenta la de abajo */
+    /* background: linear-gradient(rgba(20, 30, 20, 0.8), rgba(10, 15, 10, 0.9)), url('assets/fondoMilitar.png') center/cover; */
+    
+    border: 2px solid #5c3a21;
+    border-radius: 8px;
+    box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.9), 0 5px 15px rgba(0,0,0,0.5);
+    padding: 20px;
+    height: 680px; /* Aumentamos la altura para que quepan los slots gigantes */
+    position: relative;
+    overflow: hidden;
 }
 
-.diablo-panel-izq {
-    flex: 1;
-    background-color: #111118;
-    border: 1px solid #3f3f5a;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
+/* Columna Izquierda: Retrato, Stats y Mochila */
+.d3-left-col {
+    width: 35%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    /* Cambiamos el café por un blanco semi-transparente */
+    border-right: 2px dashed rgba(255, 255, 255, 0.15); 
+    padding-right: 20px;
+    z-index: 2;
 }
 
-.diablo-retrato {
-    width: 100%;
-    max-width: 180px;
-    height: 180px;
+.d3-retrato {
+    width: 140px; height: 140px;
     object-fit: cover;
-    border-radius: 8px;
-    border: 2px solid #9C27B0;
+    border-radius: 8px; border: 2px solid #9C27B0;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.d3-stats {
+    background: rgba(26, 26, 36, 0.9);
+    padding: 10px; border-radius: 5px; width: 100%;
+    text-align: center; border-top: 3px solid #4CAF50;
     margin-bottom: 15px;
 }
 
-.diablo-stats-caja {
-    background: #1a1a24;
-    padding: 15px;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: auto;
-    border-top: 3px solid #4CAF50;
-}
-
-.diablo-muneco-caja {
-    flex: 2;
+/* Columna Derecha: Maniquí */
+.d3-right-col {
+    width: 65%;
     position: relative;
-    width: 100%;
-    max-width: 380px;
-    height: 550px;
-    /* Pergamino mucho más oscuro y sombrío */
-    background: radial-gradient(circle at center, #a69171 0%, #614c33 100%);
-    border: 2px solid #3d2514;
-    border-radius: 8px;
-    margin: 0 auto;
-    overflow: hidden;
-    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.7);
 }
 
+/* Las Ranuras de Equipamiento (Agrandadas un 30% y sin cajas) */
+.d3-slot {
+    position: absolute;
+    width: 112px; height: 112px; /* 86px + 30% = ~112px */
+    background: transparent !important;
+    border: none !important; /* Quitamos la caja negra exterior */
+    border-radius: 4px;
+    display: flex; justify-content: center; align-items: center;
+    z-index: 10;
+}
+
+/* --- PLACEHOLDERS VISUALES (Hologramas de fondo) --- */
+.d3-slot::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-size: 45%; background-repeat: no-repeat; background-position: center;
+    /* Mayor brillo y color más neutro para que parezcan tiza/holograma */
+    opacity: 0.25; filter: invert(1) brightness(1.5); z-index: 1; pointer-events: none;
+}
+
+/* LA MAGIA: Ocultar el fantasma automáticamente si hay un objeto equipado */
+.d3-slot[data-equipped-id]:not([data-equipped-id=""])::before {
+    display: none;
+}
+
+/* Asignación de íconos por ranura */
+#slot-arma::before { background-image: url('https://cdn-icons-png.flaticon.com/512/1301/1301490.png'); } /* Espada */
+#slot-armadura::before { background-image: url('https://cdn-icons-png.flaticon.com/512/2213/2213426.png'); } /* Pechera */
+#slot-util1::before, #slot-util2::before { background-image: url('https://cdn-icons-png.flaticon.com/512/1055/1055673.png'); } /* Mochila real */
+
+
+/* --- ESTILOS DE RANURAS (LIMPIEZA DE CONFLICTOS) --- */
+/* Limpieza de versiones bloqueadas/desbloqueadas */
+.d3-slot.locked { border: none !important; background: transparent !important; }
+.d3-slot.unlocked { cursor: pointer; }
+
+/* Evitamos que el contenedor rote o salte, la animación va solo en la imagen */
+.d3-slot.unlocked:hover { transform: none; box-shadow: none; background: transparent; }
+.d3-slot.unlocked img { width: 100%; height: 100%; object-fit: contain; padding: 5px; box-sizing: border-box; background-color: rgba(10,10,15,0.9); border-radius: 4px; position: relative; z-index: 2; }
+
+/* EL TOOLTIP (Ahora usa ::after para no chocar con la imagen de fondo) */
+.d3-slot.unlocked:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 110%; left: 50%; transform: translateX(-50%);
+    background: rgba(17, 17, 24, 0.95);
+    color: #fff; font-size: 0.75rem;
+    padding: 8px; border: 1px solid #9C27B0; border-radius: 4px;
+    width: max-content; max-width: 200px;
+    text-align: center; pointer-events: none;
+    white-space: pre-wrap; z-index: 100;
+}
+
+/* --- PLACEHOLDERS VISUALES (Con Assets Propios) --- */
+.d3-slot::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-size: 100% 100%; 
+    background-repeat: no-repeat; 
+    background-position: center;
+    opacity: 0.6; 
+    z-index: 1; 
+    pointer-events: none;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+/* Bordes de color aplicados DIRECTAMENTE al holograma y a la imagen equipada */
+#slot-arma::before, #slot-arma img { border: 2px solid rgba(244, 67, 54, 0.4); } /* Rojo */
+#slot-armadura::before, #slot-armadura img, #slot-cabeza::before, #slot-cabeza img { border: 2px solid rgba(0, 188, 212, 0.4); } /* Cyan */
+#slot-util1::before, #slot-util1 img, #slot-util2::before, #slot-util2 img { border: 2px solid rgba(76, 175, 80, 0.4); } /* Verde */
+
+/* Brillo intenso al pasar el mouse por un slot operativo */
+.d3-slot.unlocked:hover::before, .d3-slot.unlocked:hover img {
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    transform: scale(1.05); /* Efecto pop-up en la imagen */
+}
+
+/* La magia: Ocultar el fantasma automáticamente si arrastraste un objeto real */
+.d3-slot[data-equipped-id]:not([data-equipped-id=""])::before { display: none; }
+
+/* La magia: Ocultar el fantasma automáticamente si arrastraste un objeto real */
+.d3-slot[data-equipped-id]:not([data-equipped-id=""])::before { display: none; }
+
+/* --- MAPEO DE TUS IMÁGENES LOCALES --- */
+/* Ranuras Activas */
+#slot-cabeza::before { background-image: url('assets/g4148.png'); } /* Casco / Visor */
+#slot-arma::before { background-image: url('assets/g3959.png'); }
+#slot-armadura::before { background-image: url('assets/g4166.png'); }
+#slot-util1::before, #slot-util2::before { background-image: url('assets/rect7368-1-7-1-7-4-0-3.png'); }
+
+/* Ranuras Bloqueadas (Usamos el 'title' del HTML para encontrarlas) */
+[title="Arma Secundaria"]::before { background-image: url('assets/g4220.png'); }
+[title="Hombros"]::before { background-image: url('assets/g4234.png'); }
+[title="Cinturón"]::before { background-image: url('assets/g4186.png'); }
+[title="Botas"]::before { background-image: url('assets/g4204.png'); }
+[title="Amuleto"]::before, [title="Anillo 1"]::before, [title="Anillo 2"]::before { background-image: url('assets/g3978.png'); }
+
+
+/* --- REDISEÑO DE CANDADOS CON TU ASSET --- */
+.d3-slot.locked {
+    border-color: #2a1f18; /* Borde más oscuro */
+}
+/* Oscurece muchísimo el placeholder del fondo si el slot está bloqueado */
+.d3-slot.locked::before {
+    opacity: 0.15; 
+}
+/* El nuevo candado de cadena centrado */
+.d3-slot.locked::after {
+    content: "";
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background-image: url('assets/locked-padlock-with-chain.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 2;
+    opacity: 0.65; /* Semi-transparente como pediste */
+    /* Este filtro convierte tu ícono negro en un tono metalizado/pergamino brillante */
+    filter: invert(0.7) sepia(0.5) saturate(2) hue-rotate(350deg);
+    pointer-events: none;
+}
+
+/* --- PARCHE DE EMERGENCIA --- */
+
+/* 1. Restaura la posición de las Mochilas para que no floten en el maniquí */
+/* Ajuste de Mochilas (Un poco más grandes también) */
+.d3-slot.static {
+    position: relative !important;
+    margin: 5px;
+    display: inline-flex;
+    width: 98px; height: 98px; 
+}
+
+/* 2. Refuerzo absoluto del Holograma del Maniquí */
 .diablo-silueta {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    object-fit: contain; 
-    transform: scale(0.85); 
-    /* 1. Invertimos la imagen (blanco se hace negro, silueta se hace clara) */
-    /* 2. Le damos un tono sepia para que combine con el pergamino */
-    filter: invert(1) sepia(0.3) opacity(0.65); 
-    /* 3. Screen hace que el negro desaparezca por completo */
-    mix-blend-mode: screen; 
-}
-
-.pd-slot-abs {
-    position: absolute;
-    width: 110px;
-    background: rgba(20, 20, 25, 0.95);
-    border: 1px solid #555;
-    border-radius: 4px;
-    padding: 5px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.8);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-}
-
-.pd-slot-abs.locked {
-    background: rgba(10, 10, 10, 0.8);
-    border: 1px dashed #444;
-    color: #666;
-    height: 30px;
-    width: 90px;
-}
-
-.pd-slot-abs.unlocked label {
-    font-size: 0.75rem;
-    color: #fff;
-    margin-bottom: 5px;
-    text-shadow: 0 0 3px #000;
-}
-
-.pd-slot-abs.unlocked select {
-    width: 100%;
-    font-size: 0.7rem;
-    background: #000;
-    color: #fff;
-    border: 1px solid #666;
-    padding: 2px;
+    object-fit: contain;
+    transform: scale(0.85);
+    /* Fuerza la inversión del fondo blanco para que se mezcle con el pergamino */
+    filter: invert(1) sepia(0.3) opacity(0.65) !important;
+    mix-blend-mode: screen !important;
+    pointer-events: none; /* Evita que la imagen bloquee el drag&drop de las ranuras */
 }
 
 /* --- ESTILOS DE INVENTARIO COMPACTO Y TABS --- */
@@ -370,12 +465,48 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
     border-left-width: 5px !important;
 }
 .inv-detalles {
-    display: none; /* Oculto por defecto */
+    display: none; 
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px dashed #3f3f5a;
     width: 100%;
 }
 .fila-tropa.inv-hover:hover .inv-detalles {
-    display: block; /* Se muestra al pasar el mouse */
+    display: block; 
 }
+
+/* --- BOTÓN DESEQUIPAR (X) --- */
+.btn-quitar-item {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #F44336;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 20;
+    opacity: 0; /* Oculto por defecto */
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+    border: 2px solid #1a1a24;
+}
+
+/* Aparece al hacer hover en el slot */
+.d3-slot:hover .btn-quitar-item {
+    opacity: 1; 
+}
+
+.btn-quitar-item:hover {
+    transform: scale(1.15);
+    background-color: #ff5252;
+}
+
+
+

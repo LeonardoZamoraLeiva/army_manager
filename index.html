@@ -147,59 +147,54 @@
                         <select id="select-soldado-armeria" onchange="cargarSlotsArmeria()"><option value="">-- Elige un Soldado --</option></select>
                     </div>
 
-                    <div id="panel-slots-equipo" style="display: none; margin-top: 20px;">
+                <div id="panel-slots-equipo" style="display: none; margin-top: 20px;">
+                        <p style="text-align: center; color: #aaa; font-size: 0.8rem; margin-top: 0;"><i>Arrastra objetos desde el inventario. Doble clic para desequipar.</i></p>
                         
-                        <div class="diablo-layout">
-                            <div class="diablo-panel-izq">
-                                <img id="diablo-retrato-real" class="diablo-retrato" src="">
-                                <h3 id="diablo-nombre" style="color: #fff; margin: 0 0 5px 0;">Nombre</h3>
-                                <p id="diablo-clase" style="color: #aaa; font-size: 0.9rem; margin: 0 0 15px 0;">Clase</p>
+                        <div class="d3-container">
+                            <div class="d3-left-col">
+                                <img id="diablo-retrato-real" class="d3-retrato" src="">
+                                <h3 id="diablo-nombre" style="color: #f5f5f5; margin: 0 0 5px 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);">Nombre</h3>
+                                <p id="diablo-clase" style="color: #b0b0c0; font-weight: bold; font-size: 0.9rem; margin: 0 0 10px 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);">Clase</p>
                                 
-                                <div class="diablo-stats-caja">
-                                    <span style="color: #aaa; font-size: 0.85rem; text-transform: uppercase;">Nivel Base</span>
-                                    <h2 id="diablo-cr-base" style="margin: 5px 0 15px 0; color: #fff; font-size: 1.5rem;">1</h2>
-                                    
-                                    <span style="color: #aaa; font-size: 0.85rem; text-transform: uppercase;">CR de Combate</span>
-                                    <h2 id="diablo-cr-total" style="margin: 5px 0 0 0; color: #4CAF50; font-size: 2.2rem;">1</h2>
+                                <div class="d3-stats">
+                                    <span style="color: #aaa; font-size: 0.75rem;">NIVEL / CR BASE: <span id="diablo-cr-base" style="color:#fff;">1</span></span><br>
+                                    <span style="color: #aaa; font-size: 0.85rem; display:block; margin-top:5px;">CR COMBATE</span>
+                                    <h2 id="diablo-cr-total" style="margin: 0; color: #4CAF50; font-size: 2.2rem; text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);">1</h2>
+                                </div>
+
+                                <div style="width: 100%; border-top: 1px dashed rgba(255, 255, 255, 0.15); margin-top: 10px; padding-top: 10px; text-align: center;">
+                                    <span style="color: #e0e0e0; font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.9);">🎒 MOCHILA TÁCTICA</span>
+                                    <div>
+                                        <div class="d3-slot unlocked static" id="slot-util1" data-slot-type="Utilidad_Mochila" data-equipped-id="" data-tooltip="Mochila (Vacía)" ondragover="permitirDrop(event)" ondrop="soltarItem(event, this)" ondblclick="desequiparSlot(this)"></div>
+                                        <div class="d3-slot unlocked static" id="slot-util2" data-slot-type="Utilidad_Mochila" data-equipped-id="" data-tooltip="Mochila (Vacía)" ondragover="permitirDrop(event)" ondrop="soltarItem(event, this)" ondblclick="desequiparSlot(this)"></div>
+                                    </div>
                                 </div>
                             </div>
 
-                        <div class="diablo-muneco-caja">
+                            <div class="d3-right-col">
                                 <img id="diablo-silueta" class="diablo-silueta" src="">
                                 
-                                <div class="pd-slot-abs locked" style="top: 20%; left: 50%; transform: translateX(-50%);"><span>🔒 Amuleto</span></div>
+                                <div class="d3-slot unlocked" id="slot-cabeza" data-slot-type="Armadura_Cabeza" data-equipped-id="" data-tooltip="Cabeza (Vacía)" style="top: 2%; left: 50%; transform: translateX(-50%);" ondragover="permitirDrop(event)" ondrop="soltarItem(event, this)" ondblclick="desequiparSlot(this)"></div>
                                 
-                                <div class="pd-slot-abs locked" style="top: 18%; left: 22%; transform: translateX(-50%);"><span>🔒 Hombros</span></div>
+                                <div class="d3-slot unlocked" id="slot-armadura" data-slot-type="Armadura_Pecho" data-equipped-id="" data-tooltip="Pecho (Vacío)" style="top: 25%; left: 50%; transform: translateX(-50%);" ondragover="permitirDrop(event)" ondrop="soltarItem(event, this)" ondblclick="desequiparSlot(this)"></div>
                                 
-                                <div class="pd-slot-abs unlocked" style="top: 5%; left: 80%; transform: translateX(-50%); border-color: #4CAF50; padding-bottom: 8px;">
-                                    <label>🎒 Mochila (x2)</label>
-                                    <select id="slot-util1" onchange="calcularCRRealTime()" style="margin-bottom: 4px;"></select>
-                                    <select id="slot-util2" onchange="calcularCRRealTime()"></select>
-                                </div>
+                                <div class="d3-slot unlocked" id="slot-arma" data-slot-type="Arma_Principal" data-equipped-id="" data-tooltip="Mano Principal (Vacía)" style="top: 40%; left: 16%; transform: translateX(-50%);" ondragover="permitirDrop(event)" ondrop="soltarItem(event, this)" ondblclick="desequiparSlot(this)"></div>
 
-                                <div class="pd-slot-abs unlocked" style="top: 30%; left: 50%; transform: translateX(-50%); border-color: #00BCD4;">
-                                    <label>🛡️ Pecho</label>
-                                    <select id="slot-armadura" onchange="calcularCRRealTime()"></select>
-                                </div>
-                                
-                                <div class="pd-slot-abs unlocked" style="top: 45%; left: 18%; transform: translateX(-50%); border-color: #F44336;">
-                                    <label>⚔️ Arma Princ.</label>
-                                    <select id="slot-arma" onchange="calcularCRRealTime()"></select>
-                                </div>
-                                
-                                <div class="pd-slot-abs locked" style="top: 45%; left: 83%; transform: translateX(-50%);"><span>🔒 Arma Sec.</span></div>
-
-
-                                <div class="pd-slot-abs locked" style="top: 45%; left: 50%; transform: translateX(-50%);"><span>🔒 Cinturón</span></div>
-                                <div class="pd-slot-abs locked" style="top: 60%; left: 22%; transform: translateX(-50%);"><span>🔒 Anillo 1</span></div>
-                                <div class="pd-slot-abs locked" style="top: 60%; left: 78%; transform: translateX(-50%);"><span>🔒 Anillo 2</span></div>
-                                <div class="pd-slot-abs locked" style="top: 75%; left: 50%; transform: translateX(-50%);"><span>🔒 Botas</span></div>
-
+                                <div class="d3-slot locked" style="top: 18%; left: 78%; transform: translateX(-50%);" title="Amuleto"></div>
+                                <div class="d3-slot locked" style="top: 18%; left: 22%; transform: translateX(-50%);" title="Hombros"></div>
+                                <div class="d3-slot locked" style="top: 40%; left: 82%; transform: translateX(-50%);" title="Arma Secundaria"></div>
+                                <div class="d3-slot locked" style="top: 45%; left: 50%; transform: translateX(-50%);" title="Cinturón"></div>
+                                <div class="d3-slot locked" style="top: 57%; left: 25%; transform: translateX(-50%);" title="Anillo 1"></div>
+                                <div class="d3-slot locked" style="top: 57%; left: 75%; transform: translateX(-50%);" title="Anillo 2"></div>
+                                <div class="d3-slot locked" style="top: 75%; left: 50%; transform: translateX(-50%);" title="Botas"></div>
                             </div>
+                        </div>
+
+                    <div id="estado-guardado-ui" style="text-align: center; color: #aaa; margin-top: 15px; font-size: 0.9rem; border-top: 1px dashed #3f3f5a; padding-top: 10px;">
+                            <span style="color: #4CAF50;">●</span> Sistema de armería en línea. Cambios guardados automáticamente en tiempo real.
+                        </div>
                     </div>
 
-                        <button onclick="guardarEquipamiento()" class="btn-accion" style="width: 100%; margin-top: 15px; background-color: #9C27B0; font-size: 1.1rem; padding: 12px; border-radius: 8px;">💾 Confirmar Loadout y Procesar Stock</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -529,10 +524,13 @@
     </div>
 
 <div id="modal-equipo" class="modal">
-        <div class="contenido-modal" style="width: 450px; border-top: 5px solid #00BCD4;">
+        <div class="contenido-modal" style="width: 500px; border-top: 5px solid #00BCD4;">
             <h2 style="color: #00BCD4;">Añadir al Inventario</h2>
             <form id="formulario-equipo">
-                <div class="grupo-input"><label>Nombre del Objeto:</label><input type="text" id="inp-eq-nombre" required></div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="grupo-input" style="flex: 2;"><label>Nombre del Objeto:</label><input type="text" id="inp-eq-nombre" required></div>
+                    <div class="grupo-input" style="flex: 2;"><label>URL Foto (Opcional):</label><input type="url" id="inp-eq-foto" placeholder="https://..."></div>
+                </div>
                 
                 <div style="display: flex; gap: 10px;">
                     <div class="grupo-input" style="flex: 2;">
@@ -543,6 +541,7 @@
                                 <option value="Arma_Secundaria">Arma Secundaria</option>
                             </optgroup>
                             <optgroup label="🛡️ Armaduras">
+                                <option value="Armadura_Cabeza">Armadura (Casco/Visor)</option>
                                 <option value="Armadura_Pecho">Armadura (Pecho)</option>
                                 <option value="Armadura_Hombros">Armadura (Hombros)</option>
                                 <option value="Armadura_Botas">Armadura (Botas)</option>
@@ -569,18 +568,23 @@
     </div>
 
 <div id="modal-editar-equipo" class="modal">
-        <div class="contenido-modal" style="width: 450px; border-top: 5px solid #FF9800;">
+        <div class="contenido-modal" style="width: 500px; border-top: 5px solid #FF9800;">
             <h2 style="color: #FF9800;">Modificar Objeto</h2>
             <form id="formulario-editar-equipo">
-                <div class="grupo-input"><label>Nombre:</label><input type="text" id="edit-eq-nombre" required></div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="grupo-input" style="flex: 2;"><label>Nombre:</label><input type="text" id="edit-eq-nombre" required></div>
+                    <div class="grupo-input" style="flex: 2;"><label>URL Foto:</label><input type="url" id="edit-eq-foto"></div>
+                </div>
                 
                 <div class="grupo-input">
                     <label>Categoría / Ranura:</label>
-                    <select id="edit-eq-tipo" required> <optgroup label="⚔️ Armas">
+                    <select id="edit-eq-tipo" required> 
+                        <optgroup label="⚔️ Armas">
                             <option value="Arma_Principal">Arma Principal</option>
                             <option value="Arma_Secundaria">Arma Secundaria</option>
                         </optgroup>
                         <optgroup label="🛡️ Armaduras">
+                            <option value="Armadura_Cabeza">Armadura (Casco/Visor)</option>
                             <option value="Armadura_Pecho">Armadura (Pecho)</option>
                             <option value="Armadura_Hombros">Armadura (Hombros)</option>
                             <option value="Armadura_Botas">Armadura (Botas)</option>
@@ -1628,41 +1632,35 @@ window.cargarSlotsArmeria = () => {
             panelSlots.style.display = 'block';
 
             const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
-            const equipoActual = soldado.equipo || { arma: '', armadura: '', util1: '', util2: '' };
+            // Agregamos 'cabeza' al molde base
+            const eq = soldado.equipo || { arma: '', armadura: '', cabeza: '', util1: '', util2: '' };
 
             document.getElementById('diablo-retrato-real').src = soldado.foto || 'https://via.placeholder.com/200x200/323245/888?text=Sin+Foto';
             document.getElementById('diablo-nombre').innerText = soldado.nombre || 'Desconocido';
-            document.getElementById('diablo-clase').innerText = `${soldado.clase || 'Sin clase'} (Nivel Base: ${soldado.nivel || 1})`;
+            document.getElementById('diablo-clase').innerText = `${soldado.clase || 'Sin clase'}`;
             document.getElementById('diablo-cr-base').innerText = soldado.nivel || 1;
 
             const imgSilueta = document.getElementById('diablo-silueta');
-            if (soldado.genero === 'Femenino') {
-                imgSilueta.src = 'https://img.freepik.com/vector-premium/figura-femenina-color-silueta-humana-cuerpo-mujer-aislado-sobre-fondo-blanco_53562-21866.jpg?w=360';
-            } else {
-                imgSilueta.src = 'https://img.freepik.com/vector-gratis/anatomia-humana-sobre-fondo-blanco_1308-68254.jpg?w=360';
-            }
+            imgSilueta.src = soldado.genero === 'Femenino' 
+                ? 'https://img.freepik.com/vector-premium/figura-femenina-color-silueta-humana-cuerpo-mujer-aislado-sobre-fondo-blanco_53562-21866.jpg?w=360' 
+                : 'https://img.freepik.com/vector-gratis/anatomia-humana-sobre-fondo-blanco_1308-68254.jpg?w=360';
 
-            const rellenarSelect = (idSelect, tipoRequerido, idEquipado) => {
-                const select = document.getElementById(idSelect);
-                if(!select) return; // Evita errores si el slot está bloqueado/eliminado
-                select.innerHTML = '<option value="">-- Vacío --</option>';
-                const opciones = equipoData.filter(eq => eq.tipo === tipoRequerido);
-                opciones.forEach(eq => {
-                    const stock = eq.stock || 0;
-                    const isEquipped = eq.id === idEquipado;
-                    if (stock > 0 || isEquipped) {
-                        const isSelected = isEquipped ? 'selected' : '';
-                        const modStr = eq.mod_cr ? `(+${eq.mod_cr})` : '';
-                        select.innerHTML += `<option value="${eq.id}" ${isSelected}>${eq.nombre} ${modStr}</option>`;
-                    }
-                });
-            };
+            // Agregamos 'slot-cabeza' a la lista de limpieza
+            ['slot-arma', 'slot-armadura', 'slot-cabeza', 'slot-util1', 'slot-util2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.dataset.equippedId = '';
+                    el.innerHTML = '';
+                    el.dataset.tooltip = "Ranura Vacía";
+                }
+            });
 
-            // Solo llenamos los 4 slots desbloqueados
-            rellenarSelect('slot-arma', 'Arma_Principal', equipoActual.arma);
-            rellenarSelect('slot-armadura', 'Armadura_Pecho', equipoActual.armadura);
-            rellenarSelect('slot-util1', 'Utilidad_Mochila', equipoActual.util1);
-            rellenarSelect('slot-util2', 'Utilidad_Mochila', equipoActual.util2);
+            // Agregamos la línea para renderizar la cabeza
+            equiparItemVisualmente(document.getElementById('slot-arma'), eq.arma);
+            equiparItemVisualmente(document.getElementById('slot-armadura'), eq.armadura);
+            equiparItemVisualmente(document.getElementById('slot-cabeza'), eq.cabeza);
+            equiparItemVisualmente(document.getElementById('slot-util1'), eq.util1);
+            equiparItemVisualmente(document.getElementById('slot-util2'), eq.util2);
 
             calcularCRRealTime();
         };
@@ -1673,33 +1671,27 @@ window.cargarSlotsArmeria = () => {
             const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
             let totalCR = Number(soldado.nivel) || 1;
 
-            // Solo calculamos el CR de los 4 slots activos
+            // Leer de los 'data-equipped-id' en lugar de '.value'
+// Leer de los 'data-equipped-id' en lugar de '.value'
             const idsSeleccionados = [
-                document.getElementById('slot-arma').value,
-                document.getElementById('slot-armadura').value,
-                document.getElementById('slot-util1').value,
-                document.getElementById('slot-util2').value
+                document.getElementById('slot-arma').dataset.equippedId,
+                document.getElementById('slot-armadura').dataset.equippedId,
+                document.getElementById('slot-cabeza').dataset.equippedId, // NUEVA LÍNEA
+                document.getElementById('slot-util1').dataset.equippedId,
+                document.getElementById('slot-util2').dataset.equippedId
             ];
 
             idsSeleccionados.forEach(id => {
                 if (id) {
                     const item = equipoData.find(eq => eq.id === id);
-                    if (item && item.mod_cr) {
-                        totalCR += Number(item.mod_cr);
-                    }
+                    if (item && item.mod_cr) totalCR += Number(item.mod_cr);
                 }
             });
 
             const crVisual = document.getElementById('diablo-cr-total');
             crVisual.innerText = totalCR;
-            
-            if (totalCR > (Number(soldado.nivel) || 1)) {
-                crVisual.style.color = '#4CAF50';
-                crVisual.style.textShadow = '0 0 10px rgba(76, 175, 80, 0.5)';
-            } else {
-                crVisual.style.color = '#fff';
-                crVisual.style.textShadow = 'none';
-            }
+            crVisual.style.color = totalCR > (Number(soldado.nivel) || 1) ? '#4CAF50' : '#fff';
+            crVisual.style.textShadow = totalCR > (Number(soldado.nivel) || 1) ? '0 0 10px rgba(76, 175, 80, 0.5)' : 'none';
         };
         
         window.guardarEquipamiento = async () => {
@@ -1710,18 +1702,18 @@ window.cargarSlotsArmeria = () => {
             const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
             const eqViejo = soldado.equipo || {};
             
-            // Guardamos solo los 4 slots activos. Los otros quedan vacíos en la BD.
+            // Leer desde los 'data-equipped-id' de los cuadrados HTML
             const eqNuevo = {
-                arma: document.getElementById('slot-arma').value,
+                arma: document.getElementById('slot-arma').dataset.equippedId || '',
                 arma_sec: '', 
-                armadura: document.getElementById('slot-armadura').value,
+                armadura: document.getElementById('slot-armadura').dataset.equippedId || '',
                 hombros: '',  
-                util1: document.getElementById('slot-util1').value,
-                util2: document.getElementById('slot-util2').value
+                util1: document.getElementById('slot-util1').dataset.equippedId || '',
+                util2: document.getElementById('slot-util2').dataset.equippedId || ''
             };
 
             let cambiosStock = {}; 
-            const slots = ['arma', 'arma_sec', 'armadura', 'hombros', 'util1', 'util2'];
+            const slots = ['arma', 'armadura', 'util1', 'util2'];
             
             slots.forEach(slot => {
                 let idViejo = eqViejo[slot];
@@ -1743,13 +1735,13 @@ window.cargarSlotsArmeria = () => {
                     }
                 }
                 
-                alert("Equipamiento asignado. Armería actualizada.");
+                alert("Equipamiento asignado con éxito.");
                 await cargarTodo(); 
                 document.getElementById('select-soldado-armeria').value = soldadoEquipandoseId;
                 cargarSlotsArmeria();
 
             } catch(e) { console.error("Error asignando:", e); }
-            finally { btn.innerText = "💾 Confirmar Loadout y Procesar Stock"; btn.disabled = false; }
+            finally { btn.innerText = "💾 Guardar Loadout y Procesar Stock"; btn.disabled = false; }
         };
         
         
@@ -1765,10 +1757,11 @@ window.cargarSlotsArmeria = () => {
 
 
 
-        // 4. Lógica para Editar Equipo Existente
+// 4. Lógica para Editar Equipo Existente
         window.abrirEditarEquipo = (id) => {
             equipoEnEdicion = equipoData.find(e => e.id === id);
             document.getElementById('edit-eq-nombre').value = equipoEnEdicion.nombre;
+            document.getElementById('edit-eq-foto').value = equipoEnEdicion.foto || ''; // <- NUEVA LÍNEA
             document.getElementById('edit-eq-tipo').value = equipoEnEdicion.tipo;
             document.getElementById('edit-eq-desc').value = equipoEnEdicion.descripcion;
             document.getElementById('edit-eq-cr').value = equipoEnEdicion.mod_cr || 0;
@@ -1794,6 +1787,7 @@ window.cargarSlotsArmeria = () => {
             try {
                 await updateDoc(doc(db, "equipo", equipoEnEdicion.id), {
                     nombre: document.getElementById('edit-eq-nombre').value,
+                    foto: document.getElementById('edit-eq-foto').value, // <- NUEVA LÍNEA
                     tipo: document.getElementById('edit-eq-tipo').value,
                     descripcion: document.getElementById('edit-eq-desc').value,
                     mod_cr: parseFloat(document.getElementById('edit-eq-cr').value) || 0
@@ -1803,11 +1797,12 @@ window.cargarSlotsArmeria = () => {
             } catch(e) { console.error("Error editando:", e); }
         });
 
-        // --- CREACIÓN Y ELIMINACIÓN DE OBJETOS/VEHÍCULOS ---
+        // --- CREACIÓN Y ELIMINACIÓN DE OBJETOS ---
         document.getElementById('formulario-equipo').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nuevo = {
                 nombre: document.getElementById('inp-eq-nombre').value,
+                foto: document.getElementById('inp-eq-foto').value, // <- NUEVA LÍNEA
                 tipo: document.getElementById('inp-eq-tipo').value,
                 descripcion: document.getElementById('inp-eq-desc').value,
                 stock: parseInt(document.getElementById('inp-eq-stock').value) || 1,
@@ -2050,26 +2045,45 @@ window.cargarSlotsArmeria = () => {
                 const stockActual = eq.stock || 0;
                 const colorStock = stockActual > 0 ? '#4CAF50' : '#F44336';
                 
-                // Nota la clase 'inv-hover' que hace la magia de ocultar detalles
+                // Si el objeto tiene foto, mostramos su imagen miniatura. Si no, un emoji por defecto.
+                const imgObjeto = eq.foto 
+                    ? `<img src="${eq.foto}" style="width: 32px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid #555;">` 
+                    : `<span style="font-size: 1.2rem;">${icono}</span>`;
+                
+                // Renderizamos la tarjeta del objeto (Estructura blindada contra textos largos)
+                const opacidad = stockActual > 0 ? '1' : '0.4';
+                const dragAtributos = stockActual > 0 
+                    ? `draggable="true" ondragstart="iniciarDrag(event, '${eq.id}', '${eq.tipo}')"` 
+                    : `title="Sin stock"`;
                 divEquipo.innerHTML += `
-                    <div class="fila-tropa inv-hover" style="border-left: 3px solid #9C27B0; flex-direction: column; align-items: flex-start; margin-bottom: 5px; padding: 10px; position: relative;">
-                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                            <strong style="color: #fff; font-size: 0.95rem;">${icono} ${eq.nombre}</strong>
-                            <div style="display: flex; gap: 5px;">
+
+                    <div class="fila-tropa inv-hover" ${dragAtributos} style="opacity: ${opacidad}; border-left: 3px solid #9C27B0; flex-direction: column; align-items: flex-start; margin-bottom: 5px; padding: 10px; position: relative; cursor: ${stockActual > 0 ? 'grab' : 'not-allowed'}; box-sizing: border-box; width: 100%; overflow: hidden;">
+                        
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: flex-start; gap: 10px;">
+                            
+                            <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                                <div style="flex-shrink: 0;">${imgObjeto}</div>
+                                <div style="display: flex; flex-direction: column; overflow: hidden;">
+                                    <strong style="color: #fff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${eq.nombre}</strong>
+                                    <span style="font-size: 0.7rem; color: #aaa;">${subSlotClean}</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 5px; flex-shrink: 0;">
                                 <button class="btn-accion" style="background-color: #555; padding: 2px 5px; font-size: 0.7rem;" onclick="abrirEditarEquipo('${eq.id}')">⚙️</button>
                                 <button class="btn-accion rojo" style="padding: 2px 5px; font-size: 0.7rem;" onclick="eliminarObjeto('${eq.id}', 'equipo')">🗑️</button>
                             </div>
                         </div>
-                        <span style="font-size: 0.75rem; color: #aaa;">${subSlotClean}</span>
                         
-                        <div class="inv-detalles">
-                            <span style="font-size: 0.8rem; color: #ccc; display: block; margin-bottom: 8px;"><i>${eq.descripcion}</i></span>
-                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                        <div class="inv-detalles" style="width: 100%; box-sizing: border-box;">
+                            <span style="font-size: 0.8rem; color: #ccc; display: block; margin: 8px 0; word-wrap: break-word; white-space: normal;"><i>${eq.descripcion}</i></span>
+                            
+                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap; gap: 5px;">
                                 <span style="font-size: 0.8rem; color: #4CAF50; font-weight: bold;">[Mod: ${modCrTexto} CR]</span>
                                 <div style="display: flex; align-items: center; background-color: #1a1a24; border-radius: 4px; border: 1px solid #3f3f5a;">
-                                    <button onclick="modificarStock('${eq.id}', -1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">-</button>
-                                    <span style="color: ${colorStock}; font-weight: bold; padding: 0 10px; font-size: 0.8rem;">Stock: ${stockActual}</span>
-                                    <button onclick="modificarStock('${eq.id}', 1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">+</button>
+                                    <button onclick="modificarStock('${eq.id}', -1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 6px;">-</button>
+                                    <span style="color: ${colorStock}; font-weight: bold; padding: 0 5px; font-size: 0.8rem;">Stock: ${stockActual}</span>
+                                    <button onclick="modificarStock('${eq.id}', 1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 6px;">+</button>
                                 </div>
                             </div>
                         </div>
@@ -2077,6 +2091,126 @@ window.cargarSlotsArmeria = () => {
                 `;
             });
         }
+
+// --- MOTOR FÍSICO: DRAG & DROP ---
+        window.iniciarDrag = (e, itemId, itemTipo) => {
+            e.dataTransfer.setData('itemId', itemId);
+            e.dataTransfer.setData('itemTipo', itemTipo);
+        };
+
+        window.permitirDrop = (e) => {
+            e.preventDefault(); // Necesario para permitir el drop
+        };
+
+window.soltarItem = async (e, slotElement) => {
+            e.preventDefault();
+            const itemIdNuevo = e.dataTransfer.getData('itemId');
+            const itemTipo = e.dataTransfer.getData('itemTipo');
+            const slotName = slotElement.id.replace('slot-', ''); // Convierte 'slot-arma' en 'arma'
+            const slotEsperado = slotElement.dataset.slotType;
+
+            // Validación de Reglas
+            if (itemTipo !== slotEsperado) {
+                alert(`Táctica inválida. No puedes equipar [${itemTipo.replace('_',' ')}] en la ranura de [${slotEsperado.replace('_',' ')}].`);
+                return;
+            }
+
+            const itemIdViejo = slotElement.dataset.equippedId;
+            if (itemIdNuevo === itemIdViejo) return; // Si suelta el mismo objeto, no hace nada
+
+            // Feedback visual de "Procesando"
+            slotElement.style.opacity = '0.3';
+            document.getElementById('estado-guardado-ui').innerHTML = '<span style="color: #FF9800;">⚙️ Procesando logística...</span>';
+
+            try {
+                // 1. Quitar 1 de stock al nuevo objeto en Firebase
+                const nuevoItem = equipoData.find(i => i.id === itemIdNuevo);
+                await updateDoc(doc(db, "equipo", itemIdNuevo), { stock: Math.max(0, (nuevoItem.stock || 0) - 1) });
+                
+                // 2. Si había un objeto viejo equipado, devolverle 1 de stock a Firebase
+                if (itemIdViejo) {
+                    const viejoItem = equipoData.find(i => i.id === itemIdViejo);
+                    if(viejoItem) await updateDoc(doc(db, "equipo", itemIdViejo), { stock: (viejoItem.stock || 0) + 1 });
+                }
+
+                // 3. Actualizar el Loadout del Soldado en Firebase
+                const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
+                const eqActual = soldado.equipo || {};
+                eqActual[slotName] = itemIdNuevo;
+                await updateDoc(doc(db, "soldados", soldadoEquipandoseId), { equipo: eqActual });
+
+                // 4. Recargar el sistema para aplicar cambios matemáticos y visuales instantáneos
+                await cargarTodo();
+                document.getElementById('select-soldado-armeria').value = soldadoEquipandoseId;
+                cargarSlotsArmeria();
+
+                document.getElementById('estado-guardado-ui').innerHTML = '<span style="color: #4CAF50;">● Equipamiento enlazado y stock actualizado.</span>';
+            } catch(error) {
+                console.error("Error al equipar:", error);
+                slotElement.style.opacity = '1';
+                document.getElementById('estado-guardado-ui').innerHTML = '<span style="color: #F44336;">❌ Error de conexión con armería.</span>';
+            }
+        };
+
+        window.desequiparSlot = async (slotElement) => {
+            const itemIdViejo = slotElement.dataset.equippedId;
+            if (!itemIdViejo) return; // Si está vacío, no hace nada
+
+            const slotName = slotElement.id.replace('slot-', '');
+            
+            slotElement.style.opacity = '0.3';
+            document.getElementById('estado-guardado-ui').innerHTML = '<span style="color: #FF9800;">⚙️ Devolviendo a la armería...</span>';
+
+            try {
+                // 1. Devolver 1 de stock al objeto viejo en Firebase
+                const viejoItem = equipoData.find(i => i.id === itemIdViejo);
+                if(viejoItem) await updateDoc(doc(db, "equipo", itemIdViejo), { stock: (viejoItem.stock || 0) + 1 });
+
+                // 2. Limpiar la ranura del soldado en Firebase
+                const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
+                const eqActual = soldado.equipo || {};
+                eqActual[slotName] = '';
+                await updateDoc(doc(db, "soldados", soldadoEquipandoseId), { equipo: eqActual });
+
+                // 3. Recargar
+                await cargarTodo();
+                document.getElementById('select-soldado-armeria').value = soldadoEquipandoseId;
+                cargarSlotsArmeria();
+
+                document.getElementById('estado-guardado-ui').innerHTML = '<span style="color: #4CAF50;">● Objeto desequipado y devuelto a inventario.</span>';
+            } catch(error) {
+                console.error("Error al desequipar:", error);
+                slotElement.style.opacity = '1';
+            }
+        };
+
+// Función auxiliar visual (Actualizada con Botón X)
+        window.equiparItemVisualmente = (slotElement, itemId) => {
+            if (!itemId) {
+                slotElement.dataset.equippedId = '';
+                slotElement.innerHTML = ''; 
+                slotElement.dataset.tooltip = "Ranura Vacía";
+                slotElement.style.opacity = '1';
+                return;
+            }
+            const item = equipoData.find(eq => eq.id === itemId);
+            if (item) {
+                slotElement.dataset.equippedId = item.id;
+                const fotoSrc = item.foto || 'https://via.placeholder.com/86/323245/888?text=Obj';
+                
+                // INYECTAMOS LA IMAGEN Y EL BOTÓN X
+                // event.stopPropagation() evita que el clic en la X interfiera con el drag&drop
+                slotElement.innerHTML = `
+                    <img src="${fotoSrc}" alt="${item.nombre}" style="width:100%; height:100%; object-fit:contain; padding: 5px; box-sizing: border-box; background-color:rgba(10,10,15,0.9); border-radius:4px; position:relative; z-index:2;">
+                    <div class="btn-quitar-item" onclick="event.stopPropagation(); desequiparSlot(this.parentElement)" title="Desequipar">✖</div>
+                `;
+                slotElement.style.opacity = '1';
+                
+                const modText = item.mod_cr > 0 ? ` (+${item.mod_cr} CR)` : '';
+                slotElement.dataset.tooltip = `${item.nombre}${modText}\n${item.descripcion}`;
+            }
+        };
+
         // Al cargar la página, descargamos toda la info
         cargarTodo();
     </script>
