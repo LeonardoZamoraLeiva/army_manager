@@ -190,3 +190,192 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 .nombre-tropa { font-size: 0.9rem; color: #fff; font-weight: bold; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 .clase-tropa { font-size: 0.75rem; color: #888; margin: 0;}
 .estrella-cmd { position: absolute; top: -10px; right: -10px; font-size: 1.5rem; filter: drop-shadow(0 0 5px #000); }
+
+/* --- ESTILOS DE DATAPAD (TERMINAL DE RECLUTAMIENTO) --- */
+.datapad-container {
+    background-color: #0b0b10 !important;
+    border: 1px solid #4CAF50 !important;
+    border-top: 15px solid #4CAF50 !important;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.15) !important;
+}
+
+.datapad-nav {
+    display: flex;
+    border-bottom: 2px solid #1a1a24;
+    margin-bottom: 20px;
+}
+
+.btn-dp-tab {
+    flex: 1;
+    background: transparent;
+    color: #666;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.btn-dp-tab:hover {
+    color: #aaa;
+    background-color: rgba(255,255,255,0.05);
+}
+
+.btn-dp-tab.activo {
+    color: #4CAF50;
+    border-bottom: 3px solid #4CAF50;
+    background-color: rgba(76, 175, 80, 0.05);
+}
+
+.dp-seccion {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- ESTILOS INVENTARIO VISUAL (DIABLO STYLE) --- */
+.diablo-layout {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.diablo-panel-izq {
+    flex: 1;
+    background-color: #111118;
+    border: 1px solid #3f3f5a;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.diablo-retrato {
+    width: 100%;
+    max-width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #9C27B0;
+    margin-bottom: 15px;
+}
+
+.diablo-stats-caja {
+    background: #1a1a24;
+    padding: 15px;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: auto;
+    border-top: 3px solid #4CAF50;
+}
+
+.diablo-muneco-caja {
+    flex: 2;
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    height: 550px;
+    /* Pergamino mucho más oscuro y sombrío */
+    background: radial-gradient(circle at center, #a69171 0%, #614c33 100%);
+    border: 2px solid #3d2514;
+    border-radius: 8px;
+    margin: 0 auto;
+    overflow: hidden;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.7);
+}
+
+.diablo-silueta {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: contain; 
+    transform: scale(0.85); 
+    /* 1. Invertimos la imagen (blanco se hace negro, silueta se hace clara) */
+    /* 2. Le damos un tono sepia para que combine con el pergamino */
+    filter: invert(1) sepia(0.3) opacity(0.65); 
+    /* 3. Screen hace que el negro desaparezca por completo */
+    mix-blend-mode: screen; 
+}
+
+.pd-slot-abs {
+    position: absolute;
+    width: 110px;
+    background: rgba(20, 20, 25, 0.95);
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 5px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.pd-slot-abs.locked {
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px dashed #444;
+    color: #666;
+    height: 30px;
+    width: 90px;
+}
+
+.pd-slot-abs.unlocked label {
+    font-size: 0.75rem;
+    color: #fff;
+    margin-bottom: 5px;
+    text-shadow: 0 0 3px #000;
+}
+
+.pd-slot-abs.unlocked select {
+    width: 100%;
+    font-size: 0.7rem;
+    background: #000;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 2px;
+}
+
+/* --- ESTILOS DE INVENTARIO COMPACTO Y TABS --- */
+.mini-tabs {
+    display: flex; gap: 5px; margin-bottom: 15px;
+}
+.mini-tab-btn {
+    flex: 1; background: #1a1a24; border: 1px solid #3f3f5a; color: #aaa; 
+    padding: 8px 5px; cursor: pointer; border-radius: 4px; font-size: 0.8rem; font-weight: bold;
+}
+.mini-tab-btn.activo {
+    background: #9C27B0; color: #fff; border-color: #9C27B0;
+}
+
+/* Efecto Hover para ocultar/mostrar detalles */
+.fila-tropa.inv-hover {
+    transition: all 0.2s;
+}
+.fila-tropa.inv-hover:hover {
+    background-color: #252533 !important;
+    transform: translateX(5px);
+    border-left-width: 5px !important;
+}
+.inv-detalles {
+    display: none; /* Oculto por defecto */
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #3f3f5a;
+    width: 100%;
+}
+.fila-tropa.inv-hover:hover .inv-detalles {
+    display: block; /* Se muestra al pasar el mouse */
+}

@@ -19,9 +19,9 @@
 
 <div class="menu-navegacion">
             <button class="btn-tab activo" onclick="cambiarPestaña('vista-barracones', this)">🛡️ Barracones</button>
-            <button class="btn-tab" onclick="cambiarPestaña('vista-escuadrones', this)">⚔️ Escuadrones</button>
             <button class="btn-tab" onclick="cambiarPestaña('vista-armeria', this)">🔫 Armería</button>
             <button class="btn-tab" onclick="cambiarPestaña('vista-hangar', this)">🚀 Hangar</button>
+            <button class="btn-tab" onclick="cambiarPestaña('vista-escuadrones', this)">⚔️ Escuadrones</button>
             <button class="btn-tab" onclick="cambiarPestaña('vista-misiones', this)">🌍 Misiones</button>
         </div>
     </header>
@@ -119,12 +119,19 @@
 
         <div id="vista-armeria" class="vista">
             <div style="display: flex; gap: 20px;">
-                <div style="flex: 1;">
-                    <div class="panel-acciones" style="border-top: 5px solid #00BCD4; margin-bottom: 20px;">
-                        <h2 style="margin: 0; color: #00BCD4;">Inventario Base</h2>
-                        <button onclick="abrirModal('modal-equipo')" class="btn-accion" style="background-color: #00BCD4;">+ Forjar / Añadir Objeto</button>
+                <div style="flex: 1; max-width: 320px;">
+                    <div class="panel-acciones" style="border-top: 5px solid #00BCD4; margin-bottom: 10px; padding: 10px;">
+                        <h2 style="margin: 0; font-size: 1.2rem; color: #00BCD4;">Armería Base</h2>
+                        <button onclick="abrirModal('modal-equipo')" class="btn-accion pequeno" style="background-color: #00BCD4;">+ Forjar</button>
                     </div>
-                    <div id="lista-equipo" class="caja-gestion" style="height: 600px; overflow-y: auto;">
+                    
+                    <div class="mini-tabs">
+                        <button class="mini-tab-btn activo" onclick="filtrarInventarioUI('Arma', this)">⚔️ Armas</button>
+                        <button class="mini-tab-btn" onclick="filtrarInventarioUI('Armadura', this)">🛡️ Armadura</button>
+                        <button class="mini-tab-btn" onclick="filtrarInventarioUI('Utilidad', this)">🎒 Utilidad</button>
+                    </div>
+
+                    <div id="lista-equipo" class="caja-gestion" style="height: 550px; overflow-y: auto; padding: 10px;">
                         <p style="color: #aaa;">Cargando inventario...</p>
                     </div>
                 </div>
@@ -133,103 +140,210 @@
                     <h2 style="margin-top: 0; color: #9C27B0;">Estación de Equipamiento</h2>
                     
                     <div class="grupo-input">
-                        <label>1. Selecciona un Escuadrón:</label>
-                        <select id="select-escuadron-armeria" onchange="cargarSoldadosArmeria()"><option value="">-- Elige un Escuadrón --</option></select>
-                    </div>
-                    
-                    <div class="grupo-input">
-                        <label>2. Selecciona un Soldado:</label>
-                        <select id="select-soldado-armeria" onchange="cargarSlotsArmeria()"><option value="">-- Esperando Escuadrón --</option></select>
+                        <label>Selecciona un Soldado para equipar:</label>
+                        <select id="select-soldado-armeria" onchange="cargarSlotsArmeria()"><option value="">-- Elige un Soldado --</option></select>
                     </div>
 
-                    <div id="panel-slots-equipo" style="display: none; margin-top: 20px; background-color: #1a1a24; padding: 15px; border-radius: 5px;">
-                        <h4 style="color: #4CAF50; margin-top: 0;">Slots de Combate</h4>
-                        <div class="grupo-input"><label>Arma (Melee o Rango):</label><select id="slot-arma"></select></div>
-                        <div class="grupo-input"><label>Armadura:</label><select id="slot-armadura"></select></div>
-                        <div class="grupo-input"><label>Objeto de Utilidad 1:</label><select id="slot-util1"></select></div>
-                        <div class="grupo-input"><label>Objeto de Utilidad 2:</label><select id="slot-util2"></select></div>
+                    <div id="panel-slots-equipo" style="display: none; margin-top: 20px;">
                         
-                        <button onclick="guardarEquipamiento()" class="btn-accion" style="width: 100%; margin-top: 10px; background-color: #4CAF50;">💾 Confirmar y Asignar Equipamiento</button>
+                        <div class="diablo-layout">
+                            <div class="diablo-panel-izq">
+                                <img id="diablo-retrato-real" class="diablo-retrato" src="">
+                                <h3 id="diablo-nombre" style="color: #fff; margin: 0 0 5px 0;">Nombre</h3>
+                                <p id="diablo-clase" style="color: #aaa; font-size: 0.9rem; margin: 0 0 15px 0;">Clase</p>
+                                
+                                <div class="diablo-stats-caja">
+                                    <span style="color: #aaa; font-size: 0.85rem; text-transform: uppercase;">Nivel Base</span>
+                                    <h2 id="diablo-cr-base" style="margin: 5px 0 15px 0; color: #fff; font-size: 1.5rem;">1</h2>
+                                    
+                                    <span style="color: #aaa; font-size: 0.85rem; text-transform: uppercase;">CR de Combate</span>
+                                    <h2 id="diablo-cr-total" style="margin: 5px 0 0 0; color: #4CAF50; font-size: 2.2rem;">1</h2>
+                                </div>
+                            </div>
+
+                        <div class="diablo-muneco-caja">
+                                <img id="diablo-silueta" class="diablo-silueta" src="">
+                                
+                                <div class="pd-slot-abs locked" style="top: 20%; left: 50%; transform: translateX(-50%);"><span>🔒 Amuleto</span></div>
+                                
+                                <div class="pd-slot-abs locked" style="top: 18%; left: 22%; transform: translateX(-50%);"><span>🔒 Hombros</span></div>
+                                
+                                <div class="pd-slot-abs unlocked" style="top: 5%; left: 80%; transform: translateX(-50%); border-color: #4CAF50; padding-bottom: 8px;">
+                                    <label>🎒 Mochila (x2)</label>
+                                    <select id="slot-util1" onchange="calcularCRRealTime()" style="margin-bottom: 4px;"></select>
+                                    <select id="slot-util2" onchange="calcularCRRealTime()"></select>
+                                </div>
+
+                                <div class="pd-slot-abs unlocked" style="top: 30%; left: 50%; transform: translateX(-50%); border-color: #00BCD4;">
+                                    <label>🛡️ Pecho</label>
+                                    <select id="slot-armadura" onchange="calcularCRRealTime()"></select>
+                                </div>
+                                
+                                <div class="pd-slot-abs unlocked" style="top: 45%; left: 18%; transform: translateX(-50%); border-color: #F44336;">
+                                    <label>⚔️ Arma Princ.</label>
+                                    <select id="slot-arma" onchange="calcularCRRealTime()"></select>
+                                </div>
+                                
+                                <div class="pd-slot-abs locked" style="top: 45%; left: 83%; transform: translateX(-50%);"><span>🔒 Arma Sec.</span></div>
+
+
+                                <div class="pd-slot-abs locked" style="top: 45%; left: 50%; transform: translateX(-50%);"><span>🔒 Cinturón</span></div>
+                                <div class="pd-slot-abs locked" style="top: 60%; left: 22%; transform: translateX(-50%);"><span>🔒 Anillo 1</span></div>
+                                <div class="pd-slot-abs locked" style="top: 60%; left: 78%; transform: translateX(-50%);"><span>🔒 Anillo 2</span></div>
+                                <div class="pd-slot-abs locked" style="top: 75%; left: 50%; transform: translateX(-50%);"><span>🔒 Botas</span></div>
+
+                            </div>
+                    </div>
+
+                        <button onclick="guardarEquipamiento()" class="btn-accion" style="width: 100%; margin-top: 15px; background-color: #9C27B0; font-size: 1.1rem; padding: 12px; border-radius: 8px;">💾 Confirmar Loadout y Procesar Stock</button>
                     </div>
                 </div>
             </div>
         </div>
-
+        
         <div id="vista-hangar" class="vista">
-            <div class="panel-acciones" style="border-top: 5px solid #795548; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="margin: 0; color: #795548;">Hangar Motorizado</h2>
                 <button onclick="abrirModal('modal-vehiculo')" class="btn-accion" style="background-color: #795548;">+ Registrar Vehículo</button>
             </div>
-            <div id="lista-vehiculos" class="grid-escuadrones">
-                <p style="color: #aaa;">Cargando vehículos...</p>
-            </div>
-        </div>
+            
+            <div id="dashboard-hangar" style="display: flex; gap: 20px;">
+                <div style="flex: 1; background-color: #252533; border-radius: 8px; padding: 15px; height: 700px; overflow-y: auto;">
+                    <div id="lista-vehiculos-nav">Cargando hangar...</div>
+                </div>
 
-        </div>
-
-    <div id="modal-soldado" class="modal">
-        <div class="contenido-modal" style="width: 700px; max-width: 90vw;">
-            <h2 style="color: #4CAF50; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Reclutar / Ficha D&D</h2>
-            <form id="formulario-soldado">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <div class="grupo-input"><label>Nombre Real:</label><input type="text" id="input-nombre" required></div>
-                        <div class="grupo-input"><label>Nombre Clave:</label><input type="text" id="input-clave"></div>
-                        <div class="grupo-input"><label>Rango Militar:</label><input type="text" id="input-rango" required></div>
-                        <div class="grupo-input"><label>Clase Base (Ej: Warlock/Sorcerer):</label><input type="text" id="input-clase" required></div>
-                        <div style="display: flex; gap: 10px;">
-                            <div class="grupo-input" style="flex: 1;"><label>Nivel (CR):</label><input type="number" id="input-nivel" min="1" max="20" value="1" required></div>
-                            <div class="grupo-input" style="flex: 1;"><label>Género:</label><select id="input-genero"><option>Femenino</option><option>Masculino</option><option>Otro</option></select></div>
-                        </div>
-                        <div class="grupo-input"><label>Desglose (Ej: Warlock 4, Sorcerer 3):</label><input type="text" id="input-clases-extra"></div>
-                        <div class="grupo-input">
-                            <label>Facción Titular:</label>
-                            <select id="input-lider" required>
-                                <option value="William">William</option>
-                                <option value="Cazador">Cazador</option>
-                                <option value="Libres">Libres (Mercenarios)</option>
-                            </select>
-                        </div>
-                        <div class="grupo-input"><label>URL Foto:</label><input type="url" id="input-foto"></div>
+                <div style="flex: 2;">
+                    <div id="tarjeta-vehiculo-vacia" style="text-align: center; color: #888; margin-top: 50px;">
+                        Selecciona un vehículo de la lista para ver sus especificaciones técnicas.
                     </div>
-
-                    <div>
-                        <div class="grupo-input"><label>Alineamiento:</label><input type="text" id="input-alineamiento" placeholder="Ej: Legal Neutral"></div>
-                        <div class="grupo-input"><label>Arma Principal:</label><input type="text" id="input-arma"></div>
+                    
+                    <div id="detalle-vehiculo-view" class="tarjeta-soldado" style="display: none; position: relative; border-top: 5px solid #795548;">
+                        <button id="btn-editar-vehiculo-detalle" class="btn-accion" style="position: absolute; top: 15px; right: 15px; background-color: #555; padding: 5px 10px;">⚙️ Editar</button>
                         
-                        <div class="grupo-input" style="background-color: #323245; padding: 10px; border-radius: 5px;">
-                            <label style="color: #fff;">Estado de Salud:</label>
-                            <div style="display: flex; gap: 5px;">
-                                <select id="input-estado" style="flex: 1;">
-                                    <option value="Activo">Activo</option>
-                                    <option value="Herido">Herido en Combate</option>
-                                </select>
-                                <input type="number" id="input-dias-herido" placeholder="Días" style="width: 70px;" title="Días inactivo por herida">
+                        <div class="cabecera-tarjeta" style="align-items: flex-start;">
+                            <img id="det-veh-foto" src="" style="width: 200px; height: 150px; object-fit: cover; border-radius: 4px; border: 2px solid #3f3f5a;">
+                            <div class="info-principal" style="margin-left: 20px;">
+                                <h2 id="det-veh-nombre" style="margin: 0; color: #795548; font-size: 2rem;">Nombre</h2>
+                                <h4 id="det-veh-modelo" style="margin: 0; color: #a0a0b5; font-style: italic;">Modelo</h4>
+                                <span id="det-veh-clases" style="color: #FF9800; font-weight: bold; font-size: 0.9rem; display: block; margin-top: 5px;">Entorno | Rol</span>
+                                <span id="det-veh-fabricante" style="color: #888; font-size: 0.8rem; display: block;">Fabricante: -</span>
                             </div>
                         </div>
+                        
+                        <div class="datos-grid" style="margin: 15px 0;">
+                            <div class="dato-item"><span class="etiqueta">HP (Casco)</span><span class="valor" id="det-veh-hp" style="color: #4CAF50;">-</span></div>
+                            <div class="dato-item"><span class="etiqueta">AC (Blindaje)</span><span class="valor" id="det-veh-ac" style="color: #4CAF50;">-</span></div>
+                            <div class="dato-item"><span class="etiqueta">Velocidad (Combate)</span><span class="valor" id="det-veh-vel">-</span></div>
+                            <div class="dato-item"><span class="etiqueta">Aumento CR</span><span class="valor" id="det-veh-cr" style="color: #9C27B0;">-</span></div>
+                        </div>
 
-                        <label style="color: #4CAF50; font-size: 0.9rem; display: block; margin-bottom: 5px; margin-top: 15px; font-weight: bold;">Atributos Base:</label>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px;">
-                            <input type="number" id="inp-str" placeholder="STR" title="Fuerza (Str)" style="padding: 5px; text-align: center;">
-                            <input type="number" id="inp-dex" placeholder="DEX" title="Destreza (Dex)" style="padding: 5px; text-align: center;">
-                            <input type="number" id="inp-con" placeholder="CON" title="Constitución (Con)" style="padding: 5px; text-align: center;">
-                            <input type="number" id="inp-int" placeholder="INT" title="Inteligencia (Int)" style="padding: 5px; text-align: center;">
-                            <input type="number" id="inp-wis" placeholder="WIS" title="Sabiduría (Wis)" style="padding: 5px; text-align: center;">
-                            <input type="number" id="inp-cha" placeholder="CHA" title="Carisma (Cha)" style="padding: 5px; text-align: center;">
+                        <div style="border-top: 1px solid #3f3f5a; padding-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            
+                            <div>
+                                <h4 style="color: #795548; margin: 0 0 10px 0; text-transform: uppercase; font-size: 0.85rem;">Especificaciones Técnicas</h4>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong style="color:#aaa;">Dimensiones:</strong> <span id="det-veh-dim">-</span></p>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong style="color:#aaa;">Velocidad Máxima:</strong> <span id="det-veh-velmax">-</span></p>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong style="color:#aaa;">Escudos:</strong> <span id="det-veh-escudos">-</span></p>
+                                <div style="margin-top: 10px;">
+                                    <strong style="color:#aaa; font-size: 0.85rem;">Armamento:</strong>
+                                    <p id="det-veh-armamento" style="margin: 2px 0 0 0; font-size: 0.85rem; color: #e0e0e0; white-space: pre-wrap;"></p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 style="color: #795548; margin: 0 0 10px 0; text-transform: uppercase; font-size: 0.85rem;">Capacidad Operativa</h4>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong style="color:#aaa;">Tripulación:</strong> <span id="det-veh-trip">-</span></p>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong style="color:#aaa;">Pasajeros:</strong> <span id="det-veh-pasajeros">-</span></p>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong style="color:#aaa;">Capacidad de Carga:</strong> <span id="det-veh-carga">-</span></p>
+                                <p style="margin: 0 0 5px 0; font-size: 0.85rem;"><strong style="color:#aaa;">Consumibles:</strong> <span id="det-veh-consumibles">-</span></p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>  
+
+        </div>
+
+        <datalist id="lista-facciones">
+        <option value="William"></option>
+        <option value="Cazador"></option>
+        <option value="Libres"></option>
+    </datalist>
+
+    <div id="modal-soldado" class="modal">
+        <div class="contenido-modal datapad-container" style="width: 750px; max-width: 95vw;">
+            <h2 style="color: #4CAF50; margin-top: 0; text-transform: uppercase; letter-spacing: 2px;">Terminal de Registro Militar</h2>
+            
+            <div class="datapad-nav">
+                <button type="button" class="btn-dp-tab activo" onclick="cambiarTabDatapad('dp-personal', this)">👤 Datos Personales</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-combate', this)">⚔️ Perfil de Combate</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-expediente', this)">📁 Expediente y Lore</button>
+            </div>
+
+            <form id="formulario-soldado">
+                <div id="dp-personal" class="dp-seccion" style="display: block;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="grupo-input"><label>Nombre Real:</label><input type="text" id="input-nombre" required></div>
+                            <div class="grupo-input"><label>Nombre Clave / Apodo:</label><input type="text" id="input-clave"></div>
+                            <div class="grupo-input"><label>Rango Militar:</label><input type="text" id="input-rango" placeholder="Ej: Soldado, Sargento" required></div>
+                            <div class="grupo-input"><label>Género:</label><select id="input-genero"><option>Femenino</option><option>Masculino</option><option>Otro</option></select></div>
+                        </div>
+                        <div>
+                            <div class="grupo-input"><label>Facción Titular:</label><input type="text" id="input-lider" list="lista-facciones" placeholder="Ej: William, Cazador..." required></div>
+                            <div class="grupo-input"><label>URL Fotografía:</label><input type="url" id="input-foto" placeholder="https://..."></div>
+                            
+                            <div class="grupo-input" style="background-color: #1a1a24; padding: 15px; border-radius: 5px; border-left: 3px solid #F44336; margin-top: 15px;">
+                                <label style="color: #fff;">Estado de Salud Médico:</label>
+                                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                                    <select id="input-estado" style="flex: 2;">
+                                        <option value="Activo">Activo y Operativo</option>
+                                        <option value="Herido">Herido en Combate</option>
+                                    </select>
+                                    <input type="number" id="input-dias-herido" placeholder="Días" style="flex: 1;" title="Días inactivo por herida">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 10px; border-top: 1px solid #3f3f5a; padding-top: 15px;">
-                    <div class="grupo-input"><label>Rasgos de Personalidad:</label><input type="text" id="input-rasgos"></div>
-                    <div class="grupo-input"><label>Motivaciones:</label><input type="text" id="input-motivaciones"></div>
-                    <div class="grupo-input"><label>Descripción / Historia:</label><textarea id="input-desc" rows="2" style="width: 100%; background-color: #1a1a24; border: 1px solid #3f3f5a; color: white; padding: 8px; border-radius: 4px; box-sizing: border-box;"></textarea></div>
-                    <div class="grupo-input"><label>Otros (Ej: Objetos clave, traumas):</label><input type="text" id="input-otros"></div>
+                <div id="dp-combate" class="dp-seccion" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="grupo-input"><label>Clase Base (RPG):</label><input type="text" id="input-clase" placeholder="Ej: Warlock, Asalto" required></div>
+                            <div class="grupo-input"><label>Nivel General (CR):</label><input type="number" id="input-nivel" min="1" max="20" value="1" required></div>
+                            <div class="grupo-input"><label>Desglose de Clases:</label><input type="text" id="input-clases-extra" placeholder="Ej: Warlock 4, Fighter 2"></div>
+                            <div class="grupo-input"><label>Arma de Preferencia:</label><input type="text" id="input-arma" placeholder="Ej: Rifle Blaster Pesado"></div>
+                        </div>
+                        <div style="background-color: #111118; padding: 15px; border-radius: 8px; border: 1px solid #3f3f5a;">
+                            <label style="color: #4CAF50; font-size: 1rem; display: block; margin-bottom: 15px; text-transform: uppercase; text-align: center; letter-spacing: 1px;">Escáner de Atributos</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">Fuerza</label><input type="number" id="inp-str" placeholder="STR" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">Destreza</label><input type="number" id="inp-dex" placeholder="DEX" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">Constitución</label><input type="number" id="inp-con" placeholder="CON" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">Inteligencia</label><input type="number" id="inp-int" placeholder="INT" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">Sabiduría</label><input type="number" id="inp-wis" placeholder="WIS" style="text-align: center; font-size: 1.2rem;"></div>
+                                <div class="grupo-input" style="margin: 0;"><label style="text-align: center; color: #aaa;">Carisma</label><input type="number" id="inp-cha" placeholder="CHA" style="text-align: center; font-size: 1.2rem;"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="botones-modal" style="margin-top: 20px;">
-                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-soldado')">Cancelar</button>
-                    <button type="submit" class="btn-accion">Guardar Personaje</button>
+                <div id="dp-expediente" class="dp-seccion" style="display: none;">
+                    <div class="grupo-input"><label>Alineamiento Psicológico:</label><input type="text" id="input-alineamiento" placeholder="Ej: Legal Neutral, Caótico Bueno"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="grupo-input"><label>Rasgos de Personalidad:</label><input type="text" id="input-rasgos"></div>
+                        <div class="grupo-input"><label>Motivaciones Principales:</label><input type="text" id="input-motivaciones"></div>
+                    </div>
+                    <div class="grupo-input"><label>Historia / Background:</label><textarea id="input-desc" rows="3" style="width: 100%; background-color: #111118; border: 1px solid #3f3f5a; color: white; padding: 10px; border-radius: 4px; box-sizing: border-box;"></textarea></div>
+                    <div class="grupo-input"><label>Notas Adicionales (Fobias, cicatrices, etc):</label><input type="text" id="input-otros"></div>
+                </div>
+
+                <div class="botones-modal" style="margin-top: 25px; border-top: 1px solid #1a1a24; padding-top: 15px;">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-soldado')">Abortar Carga</button>
+                    <button type="submit" class="btn-accion" style="background-color: #4CAF50; font-size: 1.1rem; padding: 10px 20px;">💾 Guardar Expediente</button>
                 </div>
             </form>
         </div>
@@ -240,36 +354,11 @@
             <h2 style="color: #FF9800;">Formar Escuadrón</h2>
             <form id="formulario-escuadron">
                 <div class="grupo-input"><label>Nombre (Ej: Alpha-1):</label><input type="text" id="input-nombre-esc" required></div>
-                <div class="grupo-input"><label>Facción Titular:</label><select id="input-faccion-esc" required><option value="William">William</option><option value="Cazador">Cazador</option><option value="Libres">Libres</option></select></div>
-                <div class="grupo-input"><label>Lema / Refrán (Opcional):</label><input type="text" id="input-lema-esc" placeholder="Ej: 'Primero entramos, últimos salimos'"></div>
+                <div class="grupo-input"><label>Facción Titular:</label><input type="text" id="input-faccion-esc" list="lista-facciones" placeholder="Ej: William, Cazador..." required></div>                      <div class="grupo-input"><label>Lema / Refrán (Opcional):</label><input type="text" id="input-lema-esc" placeholder="Ej: 'Primero entramos, últimos salimos'"></div>
                 <div class="grupo-input"><label>URL del Parche/Logo (Opcional):</label><input type="url" id="input-logo-esc" placeholder="https://ejemplo.com/logo.jpg"></div>
                 
                 <div class="botones-modal"><button type="button" class="btn-cancelar" onclick="cerrarModal('modal-escuadron')">Cancelar</button><button type="submit" class="btn-accion naranja">Formar</button></div>
             </form>
-        </div>
-    </div>
-
-    <div id="modal-gestionar" class="modal">
-        <div class="contenido-modal" style="width: 500px; border-top: 5px solid #2196F3;">
-            <h2 style="color: #2196F3;" id="gestion-titulo">Gestionar Escuadrón</h2>
-            
-            <div class="grupo-input">
-                <label>🎖️ Designar Comandante:</label>
-                <div style="display: flex; gap: 10px;">
-                    <select id="select-comandante" style="flex: 1;"><option value="">Nadie asignado</option></select>
-                    <button id="btn-guardar-comandante" class="btn-accion pequeno">Guardar</button>
-                </div>
-            </div>
-
-            <label style="color: #aaa; font-size: 0.9rem;">Miembros Actuales:</label>
-            <div id="lista-miembros-activos" class="caja-gestion"></div>
-
-            <label style="color: #aaa; font-size: 0.9rem;">Reclutas Disponibles (Misma facción o Libres):</label>
-            <div id="lista-reclutas-disponibles" class="caja-gestion"></div>
-
-            <div class="botones-modal">
-                <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-gestionar')">Cerrar Panel</button>
-            </div>
         </div>
     </div>
 
@@ -295,19 +384,31 @@
             <form id="formulario-mision">
                 <div class="grupo-input"><label>Título de la Misión:</label><input type="text" id="input-titulo-mision" required></div>
                 <div class="grupo-input"><label>Planeta / Zona:</label><input type="text" id="input-lugar-mision" required></div>
-                <div class="grupo-input">
-                    <label>Nivel de Peligro:</label>
-                    <select id="input-peligro-mision">
-                        <option value="Bajo">Bajo (Nvl 1-3)</option>
-                        <option value="Medio">Medio (Nvl 4-7)</option>
-                        <option value="Alto">Alto (Nvl 8-12)</option>
-                        <option value="Letal">Letal (Nvl 13+)</option>
-                    </select>
+                <div class="grupo-input"><label>Descripción / Objetivo:</label><input type="text" id="input-desc-mision" placeholder="Opcional"></div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <div class="grupo-input" style="flex: 1;">
+                        <label>Rango de Riesgo:</label>
+                        <select id="input-rango-mision">
+                            <option value="E">Rango E (Muy Fácil)</option>
+                            <option value="D">Rango D (Fácil)</option>
+                            <option value="C">Rango C (Normal)</option>
+                            <option value="B">Rango B (Difícil)</option>
+                            <option value="A">Rango A (Muy Difícil)</option>
+                            <option value="S">Rango S (Letal)</option>
+                            <option value="SS">Rango SS (Suicida)</option>
+                        </select>
+                    </div>
+                    <div class="grupo-input" style="flex: 1;"><label>Nivel de Desafío (CR):</label><input type="number" id="input-cr-mision" min="1" max="30" value="1" required></div>
                 </div>
+                
+                <div class="grupo-input"><label>Duración (Días):</label><input type="number" id="input-dias-mision" value="3" required></div>
+                <div class="grupo-input"><label>Requisito Especial (Solo S/SS):</label><input type="text" id="input-req-mision" placeholder="Ej: Navegación Cuántica"></div>
                 <div class="grupo-input"><label>Recompensa Base:</label><input type="text" id="input-recompensa-mision" required></div>
+                
                 <div class="botones-modal">
                     <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-mision')">Cancelar</button>
-                    <button type="submit" class="btn-accion rojo">Publicar</button>
+                    <button type="submit" class="btn-accion rojo">Publicar Contrato</button>
                 </div>
             </form>
         </div>
@@ -345,14 +446,35 @@
     </div>
 
 <div id="modal-equipo" class="modal">
-        <div class="contenido-modal" style="width: 400px; border-top: 5px solid #00BCD4;">
+        <div class="contenido-modal" style="width: 450px; border-top: 5px solid #00BCD4;">
             <h2 style="color: #00BCD4;">Añadir al Inventario</h2>
             <form id="formulario-equipo">
                 <div class="grupo-input"><label>Nombre del Objeto:</label><input type="text" id="inp-eq-nombre" required></div>
+                
                 <div style="display: flex; gap: 10px;">
-                    <div class="grupo-input" style="flex: 2;"><label>Ranura:</label><select id="inp-eq-tipo"><option value="Arma">⚔️ Arma</option><option value="Armadura">🛡️ Armadura</option><option value="Utilidad">🎒 Utilidad</option></select></div>
+                    <div class="grupo-input" style="flex: 2;">
+                        <label>Categoría / Ranura:</label>
+                        <select id="inp-eq-tipo" required> 
+                            <optgroup label="⚔️ Armas">
+                                <option value="Arma_Principal">Arma Principal</option>
+                                <option value="Arma_Secundaria">Arma Secundaria</option>
+                            </optgroup>
+                            <optgroup label="🛡️ Armaduras">
+                                <option value="Armadura_Pecho">Armadura (Pecho)</option>
+                                <option value="Armadura_Hombros">Armadura (Hombros)</option>
+                                <option value="Armadura_Botas">Armadura (Botas)</option>
+                            </optgroup>
+                            <optgroup label="🎒 Utilidad">
+                                <option value="Utilidad_Mochila">Mochila / Botiquín</option>
+                                <option value="Utilidad_Amuleto">Amuleto</option>
+                                <option value="Utilidad_Cinturon">Cinturón</option>
+                                <option value="Utilidad_Anillo">Anillo</option>
+                            </optgroup>
+                        </select>
+                    </div>
                     <div class="grupo-input" style="flex: 1;"><label>Stock:</label><input type="number" id="inp-eq-stock" value="1" min="1" required></div>
                 </div>
+                
                 <div class="grupo-input"><label>Descripción / Efecto Narrativo:</label><input type="text" id="inp-eq-desc" required></div>
                 <div class="grupo-input" style="background-color: #323245; padding: 10px; border-radius: 5px;">
                     <label style="color: #fff;">Aumento CR (Ej: 0.5, 1, 1.25):</label>
@@ -363,12 +485,32 @@
         </div>
     </div>
 
-    <div id="modal-editar-equipo" class="modal">
-        <div class="contenido-modal" style="width: 400px; border-top: 5px solid #FF9800;">
+<div id="modal-editar-equipo" class="modal">
+        <div class="contenido-modal" style="width: 450px; border-top: 5px solid #FF9800;">
             <h2 style="color: #FF9800;">Modificar Objeto</h2>
             <form id="formulario-editar-equipo">
                 <div class="grupo-input"><label>Nombre:</label><input type="text" id="edit-eq-nombre" required></div>
-                <div class="grupo-input"><label>Tipo:</label><select id="edit-eq-tipo"><option value="Arma">Arma</option><option value="Armadura">Armadura</option><option value="Utilidad">Utilidad</option></select></div>
+                
+                <div class="grupo-input">
+                    <label>Categoría / Ranura:</label>
+                    <select id="edit-eq-tipo" required> <optgroup label="⚔️ Armas">
+                            <option value="Arma_Principal">Arma Principal</option>
+                            <option value="Arma_Secundaria">Arma Secundaria</option>
+                        </optgroup>
+                        <optgroup label="🛡️ Armaduras">
+                            <option value="Armadura_Pecho">Armadura (Pecho)</option>
+                            <option value="Armadura_Hombros">Armadura (Hombros)</option>
+                            <option value="Armadura_Botas">Armadura (Botas)</option>
+                        </optgroup>
+                        <optgroup label="🎒 Utilidad">
+                            <option value="Utilidad_Mochila">Mochila / Botiquín</option>
+                            <option value="Utilidad_Amuleto">Amuleto</option>
+                            <option value="Utilidad_Cinturon">Cinturón</option>
+                            <option value="Utilidad_Anillo">Anillo</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
                 <div class="grupo-input"><label>Descripción:</label><input type="text" id="edit-eq-desc" required></div>
                 <div class="grupo-input"><label>Aumento CR:</label><input type="number" id="edit-eq-cr" step="any" required></div>
                 <div class="botones-modal"><button type="button" class="btn-cancelar" onclick="cerrarModal('modal-editar-equipo')">Cancelar</button><button type="submit" class="btn-accion naranja">Guardar Cambios</button></div>
@@ -377,27 +519,153 @@
     </div>
 
     <div id="modal-vehiculo" class="modal">
-        <div class="contenido-modal" style="border-top: 5px solid #795548;">
-            <h2 style="color: #795548;">Nuevo Vehículo</h2>
+        <div class="contenido-modal datapad-container" style="width: 750px; max-width: 95vw; border-color: #795548 !important; border-top-color: #795548 !important; box-shadow: 0 0 30px rgba(121, 85, 72, 0.15) !important;">
+            <h2 style="color: #795548; margin-top: 0; text-transform: uppercase; letter-spacing: 2px;">Astillero / Registro Vehicular</h2>
+            
+            <div class="datapad-nav" style="border-bottom-color: #3e2723;">
+                <button type="button" class="btn-dp-tab activo" onclick="cambiarTabDatapad('dp-veh-general', this)">🚀 Datos Generales</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-veh-combate', this)">🛡️ Ficha de Combate</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-veh-tech', this)">⚙️ Especificaciones</button>
+            </div>
+
             <form id="formulario-vehiculo">
-                <div class="grupo-input"><label>Modelo / Nombre:</label><input type="text" id="inp-veh-nombre" required></div>
-                <div class="grupo-input"><label>Descripción / Armamento:</label><input type="text" id="inp-veh-desc" required></div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                    <div class="grupo-input" style="margin:0;"><label>HP (Puntos de Casco):</label><input type="number" id="inp-veh-hp" value="50"></div>
-                    <div class="grupo-input" style="margin:0;"><label>AC (Blindaje):</label><input type="number" id="inp-veh-ac" value="15"></div>
-                    <div class="grupo-input" style="margin:0;"><label>Velocidad (ft):</label><input type="number" id="inp-veh-vel" value="60"></div>
-                    <div class="grupo-input" style="margin:0;"><label>Capacidad (Tropas):</label><input type="number" id="inp-veh-cap" value="4"></div>
+                <div id="dp-veh-general" class="dp-seccion" style="display: block;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="grupo-input"><label>Nombre / Apodo:</label><input type="text" id="inp-veh-nombre" required></div>
+                            <div class="grupo-input"><label>Modelo Exacto:</label><input type="text" id="inp-veh-modelo" placeholder="Ej: TX-130 clase Sable"></div>
+                            <div class="grupo-input"><label>Fabricante:</label><input type="text" id="inp-veh-fab" placeholder="Ej: Ingeniería Pesada Rothana"></div>
+                        </div>
+                        <div>
+                            <div class="grupo-input"><label>URL Foto:</label><input type="url" id="inp-veh-foto" placeholder="https://..."></div>
+                            <div style="display: flex; gap: 10px;">
+                                <div class="grupo-input" style="flex: 1;"><label>Entorno:</label><select id="inp-veh-entorno"><option>Terrestre</option><option>Aéreo</option><option>Espacial</option><option>Acuático</option></select></div>
+                                <div class="grupo-input" style="flex: 1;"><label>Rol:</label><select id="inp-veh-rol"><option>Asalto</option><option>Transporte</option><option>Infiltración</option><option>Apoyo</option></select></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="botones-modal">
+
+                <div id="dp-veh-combate" class="dp-seccion" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background-color: #111118; padding: 15px; border-radius: 8px; border: 1px solid #3f3f5a;">
+                            <label style="color: #4CAF50; font-size: 1rem; display: block; margin-bottom: 15px; text-transform: uppercase;">Estadísticas Base</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="grupo-input" style="margin:0;"><label>HP (Casco):</label><input type="number" id="inp-veh-hp" value="50"></div>
+                                <div class="grupo-input" style="margin:0;"><label>AC (Blindaje):</label><input type="number" id="inp-veh-ac" value="15"></div>
+                                <div class="grupo-input" style="margin:0;"><label>Vel. (ft):</label><input type="number" id="inp-veh-vel" value="60"></div>
+                                <div class="grupo-input" style="margin:0;"><label style="color:#9C27B0;">+ CR Escuadrón:</label><input type="number" id="inp-veh-cr" step="any" value="1"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="grupo-input"><label>Sistemas de Escudos:</label><input type="text" id="inp-veh-escudos" placeholder="Ej: Proyector Exo-Shell 3"></div>
+                            <div class="grupo-input"><label>Armamento Activo:</label><textarea id="inp-veh-armamento" rows="3" style="width: 100%; background-color: #1a1a24; border: 1px solid #3f3f5a; color: white; padding: 8px; border-radius: 4px;" placeholder="Ej: - Cañones láser duales"></textarea></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dp-veh-tech" class="dp-seccion" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="grupo-input"><label>Vel. Máxima (Lore):</label><input type="text" id="inp-veh-velmax" placeholder="Ej: 320 km/h"></div>
+                        <div class="grupo-input"><label>Dimensiones (L x A x P):</label><input type="text" id="inp-veh-dim" placeholder="Ej: 8.2m x 3m x 2.3m"></div>
+                        <div class="grupo-input"><label>Tripulación Requerida:</label><input type="text" id="inp-veh-trip" placeholder="Ej: 1 Piloto, 1 Artillero"></div>
+                        <div class="grupo-input"><label>Pasajeros (Capacidad Tropas):</label><input type="number" id="inp-veh-pasajeros" value="2"></div>
+                        <div class="grupo-input"><label>Capacidad de Carga:</label><input type="text" id="inp-veh-carga" placeholder="Ej: 750 kg"></div>
+                        <div class="grupo-input"><label>Consumibles (Autonomía):</label><input type="text" id="inp-veh-consumibles" placeholder="Ej: 1 día"></div>
+                    </div>
+                </div>
+
+                <div class="botones-modal" style="margin-top: 25px; border-top: 1px solid #1a1a24; padding-top: 15px;">
                     <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-vehiculo')">Cancelar</button>
-                    <button type="submit" class="btn-accion" style="background-color: #795548;">Aparcar</button>
+                    <button type="submit" class="btn-accion" style="background-color: #795548; font-size: 1.1rem; padding: 10px 20px;">🚀 Aparcar Vehículo</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <div id="modal-editar-vehiculo" class="modal">
+        <div class="contenido-modal datapad-container" style="width: 750px; max-width: 95vw; border-color: #FF9800 !important; border-top-color: #FF9800 !important; box-shadow: 0 0 30px rgba(255, 152, 0, 0.15) !important;">
+            <h2 style="color: #FF9800; margin-top: 0; text-transform: uppercase; letter-spacing: 2px;">Modificar Especificaciones</h2>
+            
+            <div class="datapad-nav" style="border-bottom-color: #5c3a00;">
+                <button type="button" class="btn-dp-tab activo" onclick="cambiarTabDatapad('dp-edit-veh-general', this)">🚀 Datos Generales</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-edit-veh-combate', this)">🛡️ Ficha de Combate</button>
+                <button type="button" class="btn-dp-tab" onclick="cambiarTabDatapad('dp-edit-veh-tech', this)">⚙️ Especificaciones</button>
+            </div>
+
+            <form id="formulario-editar-vehiculo">
+                <div id="dp-edit-veh-general" class="dp-seccion" style="display: block;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div class="grupo-input"><label>Nombre:</label><input type="text" id="edit-veh-nombre" required></div>
+                            <div class="grupo-input"><label>Modelo:</label><input type="text" id="edit-veh-modelo"></div>
+                            <div class="grupo-input"><label>Fabricante:</label><input type="text" id="edit-veh-fab"></div>
+                        </div>
+                        <div>
+                            <div class="grupo-input"><label>URL Foto:</label><input type="url" id="edit-veh-foto"></div>
+                            <div style="display: flex; gap: 10px;">
+                                <div class="grupo-input" style="flex: 1;"><label>Entorno:</label><select id="edit-veh-entorno"><option>Terrestre</option><option>Aéreo</option><option>Espacial</option><option>Acuático</option></select></div>
+                                <div class="grupo-input" style="flex: 1;"><label>Rol:</label><select id="edit-veh-rol"><option>Asalto</option><option>Transporte</option><option>Infiltración</option><option>Apoyo</option></select></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dp-edit-veh-combate" class="dp-seccion" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background-color: #111118; padding: 15px; border-radius: 8px; border: 1px solid #3f3f5a;">
+                            <label style="color: #4CAF50; font-size: 1rem; display: block; margin-bottom: 15px;">Estadísticas Base</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="grupo-input" style="margin:0;"><label>HP:</label><input type="number" id="edit-veh-hp"></div>
+                                <div class="grupo-input" style="margin:0;"><label>AC:</label><input type="number" id="edit-veh-ac"></div>
+                                <div class="grupo-input" style="margin:0;"><label>Vel. (ft):</label><input type="number" id="edit-veh-vel"></div>
+                                <div class="grupo-input" style="margin:0;"><label style="color:#9C27B0;">Aumento CR:</label><input type="number" id="edit-veh-cr" step="any"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="grupo-input"><label>Escudos:</label><input type="text" id="edit-veh-escudos"></div>
+                            <div class="grupo-input"><label>Armamento:</label><textarea id="edit-veh-armamento" rows="3" style="width: 100%; background-color: #1a1a24; border: 1px solid #3f3f5a; color: white; padding: 8px; border-radius: 4px;"></textarea></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dp-edit-veh-tech" class="dp-seccion" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="grupo-input"><label>Vel. Máxima:</label><input type="text" id="edit-veh-velmax"></div>
+                        <div class="grupo-input"><label>Dimensiones:</label><input type="text" id="edit-veh-dim"></div>
+                        <div class="grupo-input"><label>Tripulación:</label><input type="text" id="edit-veh-trip"></div>
+                        <div class="grupo-input"><label>Pasajeros:</label><input type="number" id="edit-veh-pasajeros"></div>
+                        <div class="grupo-input"><label>Carga:</label><input type="text" id="edit-veh-carga"></div>
+                        <div class="grupo-input"><label>Consumibles:</label><input type="text" id="edit-veh-consumibles"></div>
+                    </div>
+                </div>
+
+                <div class="botones-modal" style="margin-top: 25px; border-top: 1px solid #1a1a24; padding-top: 15px; justify-content: space-between;">
+                    <button type="button" class="btn-accion rojo" onclick="eliminarVehiculoActual()">Desguazar (Eliminar)</button>
+                    <div>
+                        <button type="button" class="btn-cancelar" onclick="cerrarModal('modal-editar-vehiculo')">Cancelar</button>
+                        <button type="submit" class="btn-accion naranja" style="font-size: 1.1rem; padding: 10px 20px;">💾 Guardar Cambios</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
+        function cambiarTabDatapad(idTab, btn) {
+            // Encontrar el Datapad actual (para no apagar el de los soldados por accidente)
+            const datapad = btn.closest('.contenido-modal');
+            
+            // Ocultar todas las secciones de ESTE datapad
+            datapad.querySelectorAll('.dp-seccion').forEach(sec => sec.style.display = 'none');
+            // Quitar el color activo de todos los botones de ESTE datapad
+            datapad.querySelectorAll('.btn-dp-tab').forEach(b => b.classList.remove('activo'));
+            
+            // Mostrar la sección seleccionada y encender el botón
+            document.getElementById(idTab).style.display = 'block';
+            btn.classList.add('activo');
+        }
+
         function cambiarPestaña(idVista, btn) {
             document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
             document.getElementById(idVista).classList.add('activa');
@@ -407,6 +675,7 @@
         function abrirModal(idModal) { document.getElementById(idModal).style.display = 'flex'; }
         function cerrarModal(idModal) { document.getElementById(idModal).style.display = 'none'; }
     </script>
+
 
     <script type="module">
         // IMPORTANTE: Ahora importamos updateDoc y doc para poder modificar los registros
@@ -436,19 +705,40 @@
         let equipoData = [];
         let vehiculosData = [];
 
-        // --- FUNCIÓN MAESTRA DE CARGA ---
+
+
+// --- FUNCIÓN MAESTRA DE CARGA (MOTOR V8 UNIFICADO) ---
         async function cargarTodo() {
             try {
-                // 1. Descargar todos los soldados (GUARDAMOS EL ID DEL DOCUMENTO)
-                const s_snap = await getDocs(collection(db, "soldados"));
+                // Descargar toda la base de datos simultáneamente (¡Mucho más rápido!)
+                const [s_snap, e_snap, m_snap, eq_snap, v_snap] = await Promise.all([
+                    getDocs(collection(db, "soldados")),
+                    getDocs(collection(db, "escuadrones")),
+                    getDocs(collection(db, "misiones")),
+                    getDocs(collection(db, "equipo")),
+                    getDocs(collection(db, "vehiculos"))
+                ]);
+
+                // Asignar los datos
                 soldadosData = s_snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-                // 2. Descargar todos los escuadrones (GUARDAMOS EL ID)
-                const e_snap = await getDocs(collection(db, "escuadrones"));
                 escuadronesData = e_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                misionesData = m_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                equipoData = eq_snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                vehiculosData = v_snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
+                // Renderizar todas las pantallas de golpe
                 renderizarBarracones();
                 renderizarEscuadrones();
+                renderizarMisiones();
+                renderizarArsenal();
+                renderizarHangar();
+
+                // Si estabas viendo un escuadrón, recargar su tablero para que nada quede vacío
+                if (escuadronEnEdicion && document.getElementById('detalle-escuadron-view').style.display === 'block') {
+                    const escActualizado = escuadronesData.find(e => e.id === escuadronEnEdicion.id);
+                    if (escActualizado) mostrarDetallesEscuadron(escActualizado);
+                }
+
             } catch (error) { console.error("Error global de carga:", error); }
         }
 
@@ -555,57 +845,95 @@
             });
         }
 
-        function mostrarDetallesEscuadron(esc) {
+function mostrarDetallesEscuadron(esc) {
+            escuadronEnEdicion = esc; // Guardar referencia global
             document.getElementById('tarjeta-escuadron-vacia').style.display = 'none';
             const vista = document.getElementById('detalle-escuadron-view');
             vista.style.display = 'block';
 
-            // Recolectar a las tropas
+            // 1. Recolectar a las tropas y vehículos
             const miembros = soldadosData.filter(s => s.escuadron_id === esc.id);
             const comandante = miembros.find(s => s.id === esc.comandante_id);
             const tropasRestantes = miembros.filter(s => s.id !== esc.comandante_id);
+            const vehiculoActual = vehiculosData.find(v => v.id === esc.vehiculo_id);
 
-            // Generar HTML del Comandante (Si existe)
-            let htmlComandante = '';
-            if (comandante) {
-                const foto = comandante.foto || 'https://via.placeholder.com/150x150/323245/888888?text=Sin+Foto';
-                htmlComandante = `
-                    <div class="tarjeta-miembro-escuadron es-comandante">
-                        <span class="estrella-cmd">⭐</span>
-                        <img src="${foto}" class="foto-miniatura-tropa">
+            // Reclutas Disponibles (Libres o misma facción, y sin escuadrón)
+            const disponibles = soldadosData.filter(s => !s.escuadron_id && (s.lider === esc.faccion || s.lider === "Libres"));
+            
+            // Vehículos Disponibles (Libres o el que ya tiene el escuadrón)
+            const vehiculosLibres = vehiculosData.filter(v => !v.escuadron_id || v.escuadron_id === esc.id);
+
+            // Generar Opciones HTML para los Selects
+            let opcionesTropas = '<option value="">-- Reclutar --</option>';
+            disponibles.forEach(d => opcionesTropas += `<option value="${d.id}">${d.nombre} (${d.clase})</option>`);
+            
+            let opcionesVehiculos = '<option value="">-- Aparcar --</option>';
+            vehiculosLibres.forEach(v => opcionesVehiculos += `<option value="${v.id}">${v.nombre}</option>`);
+
+            // --- SLOT 1: VEHÍCULO ---
+            let htmlVehiculo = `
+                <div class="tarjeta-miembro-escuadron" style="border-color: #795548; width: 160px;">
+                    <h4 style="color: #795548; margin: 0 0 5px 0;">🚀 Transporte</h4>
+                    ${vehiculoActual ? `
+                        <img src="${vehiculoActual.foto || 'https://via.placeholder.com/150/323245/888?text=V'}" class="foto-miniatura-tropa" style="border-radius: 4px; object-fit: cover;">
+                        <p class="nombre-tropa" style="color:#795548;">${vehiculoActual.nombre}</p>
+                        <p class="clase-tropa" style="color:#9C27B0; font-weight:bold;">+${vehiculoActual.mod_cr || 0} CR</p>
+                        <button class="btn-accion rojo pequeno" style="margin-top: 10px; width: 100%;" onclick="asignarVehiculoEnLinea(null, '${esc.id}')">Quitar</button>
+                    ` : `
+                        <div style="height: 100px; display: flex; align-items: center; justify-content: center; border: 1px dashed #795548; margin-bottom: 8px; color: #888;">Vacío</div>
+                        <select id="sel-veh-${esc.id}" style="width: 100%; margin-bottom: 5px; background: #111; color: white; border: 1px solid #555;">${opcionesVehiculos}</select>
+                        <button class="btn-accion pequeno" style="background-color: #795548; width: 100%;" onclick="asignarVehiculoEnLinea(document.getElementById('sel-veh-${esc.id}').value, '${esc.id}')">Asignar</button>
+                    `}
+                </div>
+            `;
+
+            // --- SLOT 2: COMANDANTE ---
+            let htmlComandante = `
+                <div class="tarjeta-miembro-escuadron es-comandante" style="width: 160px;">
+                    <span class="estrella-cmd">⭐</span>
+                    <h4 style="color: #FF9800; margin: 0 0 5px 0;">Comandante</h4>
+                    ${comandante ? `
+                        <img src="${comandante.foto || 'https://via.placeholder.com/150/323245/888?text=Cmd'}" class="foto-miniatura-tropa">
                         <p class="nombre-tropa">${comandante.nombre}</p>
                         <p class="clase-tropa">${comandante.clase} (Nvl ${comandante.nivel || 1})</p>
+                        <button class="btn-accion rojo pequeno" style="margin-top: 10px; width: 100%;" onclick="quitarTropaEnLinea('${comandante.id}')">Relevar</button>
+                    ` : `
+                        <div style="height: 100px; display: flex; align-items: center; justify-content: center; border: 1px dashed #FF9800; margin-bottom: 8px; color: #888;">Vacío</div>
+                        <select id="sel-cmd-${esc.id}" style="width: 100%; margin-bottom: 5px; background: #111; color: white; border: 1px solid #555;">${opcionesTropas}</select>
+                        <button class="btn-accion naranja pequeno" style="width: 100%;" onclick="asignarComandanteEnLinea(document.getElementById('sel-cmd-${esc.id}').value, '${esc.id}')">Asignar</button>
+                    `}
+                </div>
+            `;
+
+// --- SLOTS 3, 4 y 5: TROPAS BASE ---
+            let htmlTropas = '';
+            for(let i = 0; i < 3; i++) {
+                const tropa = tropasRestantes[i];
+                htmlTropas += `
+                    <div class="tarjeta-miembro-escuadron" style="width: 130px; border-color: #4CAF50; flex-shrink: 0;">
+                        <h4 style="color: #4CAF50; margin: 0 0 5px 0; font-size: 0.9rem;">Soldado ${i+1}</h4>
+                        ${tropa ? `
+                            <img src="${tropa.foto || 'https://via.placeholder.com/150/323245/888?text=Sld'}" class="foto-miniatura-tropa" style="width: 70px; height: 70px; margin: 0 auto 8px auto; display: block;">
+                            <p class="nombre-tropa" style="font-size: 0.85rem;">${tropa.nombre}</p>
+                            <p class="clase-tropa" style="font-size: 0.75rem;">${tropa.clase} (Nvl ${tropa.nivel || 1})</p>
+                            <button class="btn-accion rojo pequeno" style="margin-top: 10px; width: 100%; font-size: 0.8rem;" onclick="quitarTropaEnLinea('${tropa.id}')">Quitar</button>
+                        ` : `
+                            <div style="height: 70px; display: flex; align-items: center; justify-content: center; border: 1px dashed #4CAF50; margin-bottom: 8px; color: #888; font-size: 0.8rem;">Vacío</div>
+                            <select id="sel-trp-${i}-${esc.id}" style="width: 100%; margin-bottom: 5px; background: #111; color: white; border: 1px solid #555; font-size: 0.75rem;">${opcionesTropas}</select>
+                            <button class="btn-accion pequeno" style="background-color: #4CAF50; width: 100%; font-size: 0.8rem;" onclick="asignarTropaEnLinea(document.getElementById('sel-trp-${i}-${esc.id}').value, '${esc.id}')">Asignar</button>
+                        `}
                     </div>
                 `;
             }
 
-            // Generar HTML del resto de la tropa (O de todos si no hay comandante)
-            let htmlTropas = '';
-            const tropasAMostrar = comandante ? tropasRestantes : miembros; // Si no hay comandante, van todos juntos
-            
-            if (tropasAMostrar.length === 0 && !comandante) {
-                htmlTropas = '<p style="color:#888; width: 100%; text-align: center;">Sin personal asignado.</p>';
-            } else {
-                tropasAMostrar.forEach(m => {
-                    const foto = m.foto || 'https://via.placeholder.com/150x150/323245/888888?text=Sin+Foto';
-                    htmlTropas += `
-                        <div class="tarjeta-miembro-escuadron">
-                            <img src="${foto}" class="foto-miniatura-tropa">
-                            <p class="nombre-tropa">${m.nombre}</p>
-                            <p class="clase-tropa">${m.clase} (Nvl ${m.nivel || 1})</p>
-                        </div>
-                    `;
-                });
-            }
-
-            // Datos base
+            // Datos base y estadísticas
             const logo = esc.logo || 'https://via.placeholder.com/300x300/111118/FF9800?text=LOGO';
             const lema = esc.lema ? `"${esc.lema}"` : '"A la espera de órdenes"';
             const m_totales = esc.misiones_totales || 0;
             const m_exito = esc.misiones_exito || 0;
             const porcentaje = m_totales > 0 ? Math.round((m_exito / m_totales) * 100) : 0;
 
-            // Inyectar el Layout (Basado en tu dibujo)
+            // Inyectar el Nuevo Layout Visual
             vista.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                     <div>
@@ -613,8 +941,7 @@
                         <span style="background-color: #323245; padding: 4px 10px; border-radius: 12px; font-size: 0.9rem;">Facción: ${esc.faccion}</span>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn-accion naranja" onclick="abrirGestionEscuadronObj('${esc.id}')">Gestionar Tropas</button>
-                        <button class="btn-accion" style="background-color: #555;" onclick="abrirEditarEscuadronObj('${esc.id}')">⚙️</button>
+                        <button class="btn-accion" style="background-color: #555;" onclick="abrirEditarEscuadronObj('${esc.id}')">⚙️ Ajustes del Escuadrón</button>
                     </div>
                 </div>
 
@@ -632,12 +959,78 @@
                     </div>
 
                     <div class="columna-tropas-escuadron">
-                        ${comandante ? `<div class="fila-comandante">${htmlComandante}</div>` : ''}
-                        <div class="fila-tropas">${htmlTropas}</div>
+                        <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 30px; width: 100%;">
+                            ${htmlVehiculo}
+                            ${htmlComandante}
+                        </div>
+                        <div style="display: flex; justify-content: center; gap: 15px; width: 100%; flex-wrap: nowrap;">
+                            ${htmlTropas}
+                        </div>
                     </div>
                 </div>
             `;
         }
+
+        // --- FUNCIONES DE ASIGNACIÓN EN LÍNEA (LOADOUT) ---
+
+        window.asignarVehiculoEnLinea = async (vehId, escId) => {
+            if(!vehId && vehId !== null) return; // Evita enviar vacíos si no seleccionaron nada
+            try {
+                // Liberar vehículo anterior si lo hubiera
+                const esc = escuadronesData.find(e => e.id === escId);
+                if (esc.vehiculo_id) {
+                    await updateDoc(doc(db, "vehiculos", esc.vehiculo_id), { escuadron_id: null });
+                }
+                
+                // Asignar el nuevo
+                await updateDoc(doc(db, "escuadrones", escId), { vehiculo_id: vehId || null });
+                if (vehId) {
+                    await updateDoc(doc(db, "vehiculos", vehId), { escuadron_id: escId });
+                }
+                
+                await cargarTodo();
+                mostrarDetallesEscuadron(escuadronesData.find(e => e.id === escId));
+            } catch(e) { console.error("Error asig. vehículo:", e); }
+        };
+
+        window.asignarComandanteEnLinea = async (soldadoId, escId) => {
+            if(!soldadoId) return;
+            try {
+                await updateDoc(doc(db, "soldados", soldadoId), { escuadron_id: escId });
+                await updateDoc(doc(db, "escuadrones", escId), { comandante_id: soldadoId });
+                
+                await cargarTodo();
+                mostrarDetallesEscuadron(escuadronesData.find(e => e.id === escId));
+            } catch(e) { console.error("Error asig. comandante:", e); }
+        };
+
+        window.asignarTropaEnLinea = async (soldadoId, escId) => {
+            if(!soldadoId) return;
+            try {
+                await updateDoc(doc(db, "soldados", soldadoId), { escuadron_id: escId });
+                await cargarTodo();
+                mostrarDetallesEscuadron(escuadronesData.find(e => e.id === escId));
+            } catch(e) { console.error("Error asig. tropa:", e); }
+        };
+
+        window.quitarTropaEnLinea = async (soldadoId) => {
+            try {
+                const s = soldadosData.find(sold => sold.id === soldadoId);
+                const escId = s.escuadron_id;
+                const esc = escuadronesData.find(e => e.id === escId);
+                
+                // Desvincular de los barracones
+                await updateDoc(doc(db, "soldados", soldadoId), { escuadron_id: null });
+                
+                // Si era el comandante, remover el título
+                if (esc && esc.comandante_id === soldadoId) {
+                    await updateDoc(doc(db, "escuadrones", escId), { comandante_id: null });
+                }
+                
+                await cargarTodo();
+                mostrarDetallesEscuadron(escuadronesData.find(e => e.id === escId));
+            } catch(e) { console.error("Error quitando tropa:", e); }
+        };
 
         // --- PEQUEÑOS ADAPTADORES PARA QUE LOS BOTONES FUNCIONEN CON LA NUEVA VISTA ---
         window.abrirGestionEscuadronObj = (id) => {
@@ -657,110 +1050,10 @@
         };
 
         // --- LÓGICA DE GESTIÓN DE ESCUADRÓN (EL NÚCLEO NUEVO) ---
-        window.abrirGestionEscuadron = (esc) => { // Hacemos la función accesible globalmente
-            escuadronEnEdicion = esc;
-            document.getElementById('gestion-titulo').innerText = `Gestionar: ${esc.nombre}`;
-            
-            // 1. Separar soldados
-            // Miembros Actuales: Los que tienen el ID de este escuadrón
-            const miembrosActuales = soldadosData.filter(s => s.escuadron_id === esc.id);
-            
-            // Reclutas Disponibles: No tienen escuadrón AND (Son de la misma facción OR son Libres)
-            const disponibles = soldadosData.filter(s => 
-                !s.escuadron_id && 
-                (s.lider === esc.faccion || s.lider === "Libres")
-            );
-
-            // 2. Renderizar Select de Comandante
-            const selectCmd = document.getElementById('select-comandante');
-            selectCmd.innerHTML = '<option value="">Nadie asignado</option>';
-            miembrosActuales.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.id;
-                opt.text = m.nombre;
-                if(esc.comandante_id === m.id) opt.selected = true;
-                selectCmd.appendChild(opt);
-            });
-
-            // 3. Renderizar Miembros Actuales
-            const divActivos = document.getElementById('lista-miembros-activos');
-            divActivos.innerHTML = '';
-            if(miembrosActuales.length === 0) divActivos.innerHTML = '<p style="color:#888;">Vacío</p>';
-            miembrosActuales.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'fila-tropa';
-                div.innerHTML = `<span>${m.id === esc.comandante_id ? '⭐ ' : ''}${m.nombre} (${m.rango})</span>`;
-                
-                const btnRemove = document.createElement('button');
-                btnRemove.className = 'btn-accion rojo pequeno';
-                btnRemove.innerText = 'X';
-                btnRemove.onclick = () => moverSoldado(m.id, null); // Null = Quitar del escuadrón
-                
-                div.appendChild(btnRemove);
-                divActivos.appendChild(div);
-            });
-
-            // 4. Renderizar Reclutas Disponibles
-            const divDisponibles = document.getElementById('lista-reclutas-disponibles');
-            divDisponibles.innerHTML = '';
-            if(disponibles.length === 0) divDisponibles.innerHTML = '<p style="color:#888;">No hay soldados elegibles libres.</p>';
-            disponibles.forEach(m => {
-                const div = document.createElement('div');
-                div.className = 'fila-tropa';
-                div.innerHTML = `<span>${m.nombre} <span style="color:#aaa;">(${m.lider})</span></span>`;
-                
-                const btnAdd = document.createElement('button');
-                btnAdd.className = 'btn-accion pequeno';
-                btnAdd.innerText = '+ Añadir';
-                btnAdd.onclick = () => moverSoldado(m.id, esc.id); // Asignar a este escuadrón
-                
-                div.appendChild(btnAdd);
-                divDisponibles.appendChild(div);
-            });
-
-            abrirModal('modal-gestionar');
-        };
 
         // Función para Asignar/Remover soldados de la base de datos
 // Función para Asignar/Remover soldados de la base de datos
-async function moverSoldado(soldadoId, nuevoEscuadronId) {
-            // REGLA DE JUEGO: Límite de 4 soldados por escuadrón
-            if (nuevoEscuadronId !== null) {
-                const miembrosYaAsignados = soldadosData.filter(s => s.escuadron_id === nuevoEscuadronId);
-                if (miembrosYaAsignados.length >= 4) {
-                    alert("⚠️ CAPACIDAD MÁXIMA ALCANZADA: Los vehículos de transporte actuales solo admiten escuadrones de 4 soldados.");
-                    return; // Corta la ejecución aquí
-                }
-            }
-
-            try {
-                const soldadoRef = doc(db, "soldados", soldadoId);
-                await updateDoc(soldadoRef, { escuadron_id: nuevoEscuadronId });
-                
-                if (nuevoEscuadronId === null && escuadronEnEdicion.comandante_id === soldadoId) {
-                    const escRef = doc(db, "escuadrones", escuadronEnEdicion.id);
-                    await updateDoc(escRef, { comandante_id: null });
-                }
-
-                await cargarTodo();
-                const escActualizado = escuadronesData.find(e => e.id === escuadronEnEdicion.id);
-                abrirGestionEscuadron(escActualizado);
-            } catch(e) { console.error("Error moviendo tropa", e); }
-        }
-            
-        // Función para Guardar al Comandante
-        document.getElementById('btn-guardar-comandante').addEventListener('click', async () => {
-            const nuevoCmdId = document.getElementById('select-comandante').value;
-            try {
-                const escRef = doc(db, "escuadrones", escuadronEnEdicion.id);
-                // Si eligen "Nadie asignado", mandamos null
-                await updateDoc(escRef, { comandante_id: nuevoCmdId || null });
-                
-                await cargarTodo();
-                const escActualizado = escuadronesData.find(e => e.id === escuadronEnEdicion.id);
-                abrirGestionEscuadron(escActualizado);
-            } catch(e) { console.error("Error asignando comandante", e); }
-        });
+     
 
 
         // --- FORMULARIOS BÁSICOS ---
@@ -869,27 +1162,6 @@ document.getElementById('formulario-editar-escuadron').addEventListener('submit'
 
         // --- LÓGICA DE MISIONES ---
 
-// 1. Modificar cargarTodo() original para que traiga Misiones, Equipo y Vehículos
-        const cargarTodoOriginal = cargarTodo;
-        cargarTodo = async () => {
-            await cargarTodoOriginal(); 
-            try {
-                // Cargar Misiones
-                const m_snap = await getDocs(collection(db, "misiones"));
-                misionesData = m_snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderizarMisiones();
-
-                // Cargar Arsenal
-                const eq_snap = await getDocs(collection(db, "equipo"));
-                equipoData = eq_snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                
-                const v_snap = await getDocs(collection(db, "vehiculos"));
-                vehiculosData = v_snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                
-                renderizarArsenal();
-            } catch(e) { console.error("Error en carga extendida:", e); }
-        };
-
         function renderizarMisiones() {
             const contenedor = document.getElementById('contenedor-misiones');
             contenedor.innerHTML = '';
@@ -937,8 +1209,22 @@ document.getElementById('formulario-editar-escuadron').addEventListener('submit'
                     htmlAsignados = `<span style="color: #9C27B0; font-weight:bold;">${nombres.join(', ')}</span>`;
                 }
 
-                if(totalSoldados > 0) nivelPromedio = (nivelPromedio / totalSoldados).toFixed(1);
+                // Sumar vehículos de los escuadrones desplegados
+                let bonusVehiculos = 0;
+                if(mision.escuadrones) {
+                    mision.escuadrones.forEach(idEsc => {
+                        const esc = escuadronesData.find(e => e.id === idEsc);
+                        if (esc && esc.vehiculo_id) {
+                            const veh = vehiculosData.find(v => v.id === esc.vehiculo_id);
+                            if (veh && veh.mod_cr) bonusVehiculos += Number(veh.mod_cr);
+                        }
+                    });
+                }
 
+                // Cálculo Final: Promedio de los soldados + la suma bruta de los vehículos
+                if(totalSoldados > 0) {
+                    nivelPromedio = ((nivelPromedio / totalSoldados) + bonusVehiculos).toFixed(1);
+                }
                 // MATEMÁTICAS DE SUPERVIVENCIA PARA LOS DADOS (Si hay tropas)
                 let panelDados = '';
                 if(totalSoldados > 0) {
@@ -997,15 +1283,20 @@ document.getElementById('formulario-editar-escuadron').addEventListener('submit'
             });
         }
 
-        // Crear Misión Manual
+// Crear Misión Manual
         document.getElementById('formulario-mision').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nueva = {
                 titulo: document.getElementById('input-titulo-mision').value,
                 lugar: document.getElementById('input-lugar-mision').value,
-                peligro: document.getElementById('input-peligro-mision').value,
-                recompensa: document.getElementById('input-recompensa-mision').value,
-                escuadrones: [] // Al inicio no hay escuadrones
+                descripcion: document.getElementById('input-desc-mision').value || "Misión de campo estándar.",
+                rango: document.getElementById('input-rango-mision').value,
+                cr: parseInt(document.getElementById('input-cr-mision').value) || 1,
+                dias: parseInt(document.getElementById('input-dias-mision').value) || 1,
+                requisitoEspecial: document.getElementById('input-req-mision').value || "",
+                recompensaBase: document.getElementById('input-recompensa-mision').value,
+                recompensaAdicional: "Ninguna", // Puede editarse después si quieres
+                escuadrones: [] 
             };
             await addDoc(collection(db, "misiones"), nueva);
             cerrarModal('modal-mision');
@@ -1144,90 +1435,7 @@ window.generarMisionAleatoria = async () => {
         let vehiculoEnEdicion = null;
         let soldadoEquipandoseId = null;
 
-        function renderizarArsenal() {
-            // 1. Renderizar Lista Izquierda (Armería)
-            const divEquipo = document.getElementById('lista-equipo');
-            divEquipo.innerHTML = '';
-            if(equipoData.length === 0) divEquipo.innerHTML = '<p style="color:#888;">Armería vacía.</p>';
-            
-            equipoData.forEach(eq => {
-                const icono = eq.tipo === 'Armadura' ? '🛡️' : eq.tipo === 'Arma' ? '⚔️' : '🎒';
-                const modCrTexto = eq.mod_cr > 0 ? `+${eq.mod_cr}` : `${eq.mod_cr || 0}`;
-                const stockActual = eq.stock || 0;
-                const colorStock = stockActual > 0 ? '#4CAF50' : '#F44336';
-                
-                divEquipo.innerHTML += `
-                    <div class="fila-tropa" style="border-left: 3px solid #00BCD4; flex-direction: column; align-items: flex-start; margin-bottom: 10px; padding: 10px; position: relative;">
-                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                            <strong style="color: #fff;">${icono} ${eq.nombre}</strong>
-                            <div style="display: flex; gap: 5px;">
-                                <button class="btn-accion" style="background-color: #555; padding: 2px 8px;" onclick="abrirEditarEquipo('${eq.id}')" title="Editar">⚙️</button>
-                                <button class="btn-accion rojo" style="padding: 2px 8px;" onclick="eliminarObjeto('${eq.id}', 'equipo')" title="Eliminar">🗑️</button>
-                            </div>
-                        </div>
-                        <span style="font-size: 0.8rem; color: #aaa; margin-top: 5px;">${eq.descripcion}</span>
-                        
-                        <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 10px; align-items: center;">
-                            <span style="font-size: 0.8rem; color: #9C27B0; font-weight: bold;">[Modificador: ${modCrTexto} CR]</span>
-                            
-                            <div style="display: flex; align-items: center; background-color: #1a1a24; border-radius: 4px; border: 1px solid #3f3f5a;">
-                                <button onclick="modificarStock('${eq.id}', -1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">-</button>
-                                <span style="color: ${colorStock}; font-weight: bold; padding: 0 10px; font-size: 0.9rem;">Stock: ${stockActual}</span>
-                                <button onclick="modificarStock('${eq.id}', 1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">+</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // 2. Llenar Desplegable de Escuadrones en la Estación de Equipamiento
-            const selectEscuadron = document.getElementById('select-escuadron-armeria');
-            selectEscuadron.innerHTML = '<option value="">-- Elige un Escuadrón --</option>';
-            escuadronesData.forEach(esc => {
-                selectEscuadron.innerHTML += `<option value="${esc.id}">${esc.nombre}</option>`;
-            });
-
-            // 3. Renderizar Hangar de Vehículos (Tarjetas estilo Escuadrón)
-            const divVehiculos = document.getElementById('lista-vehiculos');
-            divVehiculos.innerHTML = '';
-            if(vehiculosData.length === 0) divVehiculos.innerHTML = '<p style="color:#aaa;">Hangar vacío.</p>';
-            
-            vehiculosData.forEach(veh => {
-                divVehiculos.innerHTML += `
-                    <div class="tarjeta-escuadron" style="border-top-color: #795548;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <h3 style="color: #795548; margin: 0 0 5px 0;">🚀 ${veh.nombre}</h3>
-                            <button class="btn-accion rojo pequeno" onclick="eliminarObjeto('${veh.id}', 'vehiculos')">🗑️</button>
-                        </div>
-                        <p style="margin: 5px 0; font-size: 0.85rem; color: #ccc;"><i>${veh.descripcion}</i></p>
-                        <div class="datos-grid" style="margin-top: 15px; gap: 8px;">
-                            <div class="dato-item" style="padding: 5px;"><span class="etiqueta">HP / AC</span><span class="valor" style="font-size: 0.9rem; color: #4CAF50;">${veh.hp} / ${veh.ac}</span></div>
-                            <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Velocidad</span><span class="valor" style="font-size: 0.9rem;">${veh.vel} ft</span></div>
-                            <div class="dato-item" style="padding: 5px;"><span class="etiqueta">Capacidad</span><span class="valor" style="font-size: 0.9rem;">${veh.cap} Tropas</span></div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // --- SISTEMA DE EQUIPAMIENTO (Selectores Encadenados) ---
-        window.cargarSoldadosArmeria = () => {
-            const idEscuadron = document.getElementById('select-escuadron-armeria').value;
-            const selectSoldado = document.getElementById('select-soldado-armeria');
-            const panelSlots = document.getElementById('panel-slots-equipo');
-            
-            selectSoldado.innerHTML = '<option value="">-- Elige un Soldado --</option>';
-            panelSlots.style.display = 'none'; // Ocultar panel hasta elegir soldado
-
-            if(!idEscuadron) return;
-
-            const miembros = soldadosData.filter(s => s.escuadron_id === idEscuadron);
-            miembros.forEach(m => {
-                selectSoldado.innerHTML += `<option value="${m.id}">${m.nombre} (${m.clase})</option>`;
-            });
-        };
-
-        window.cargarSlotsArmeria = () => {
+window.cargarSlotsArmeria = () => {
             soldadoEquipandoseId = document.getElementById('select-soldado-armeria').value;
             const panelSlots = document.getElementById('panel-slots-equipo');
             
@@ -1237,34 +1445,78 @@ window.generarMisionAleatoria = async () => {
             const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
             const equipoActual = soldado.equipo || { arma: '', armadura: '', util1: '', util2: '' };
 
-            // Función interna actualizada para validar Stock
+            document.getElementById('diablo-retrato-real').src = soldado.foto || 'https://via.placeholder.com/200x200/323245/888?text=Sin+Foto';
+            document.getElementById('diablo-nombre').innerText = soldado.nombre || 'Desconocido';
+            document.getElementById('diablo-clase').innerText = `${soldado.clase || 'Sin clase'} (Nivel Base: ${soldado.nivel || 1})`;
+            document.getElementById('diablo-cr-base').innerText = soldado.nivel || 1;
+
+            const imgSilueta = document.getElementById('diablo-silueta');
+            if (soldado.genero === 'Femenino') {
+                imgSilueta.src = 'https://img.freepik.com/vector-premium/figura-femenina-color-silueta-humana-cuerpo-mujer-aislado-sobre-fondo-blanco_53562-21866.jpg?w=360';
+            } else {
+                imgSilueta.src = 'https://img.freepik.com/vector-gratis/anatomia-humana-sobre-fondo-blanco_1308-68254.jpg?w=360';
+            }
+
             const rellenarSelect = (idSelect, tipoRequerido, idEquipado) => {
                 const select = document.getElementById(idSelect);
-                select.innerHTML = '<option value="">-- Ninguno --</option>';
-                
+                if(!select) return; // Evita errores si el slot está bloqueado/eliminado
+                select.innerHTML = '<option value="">-- Vacío --</option>';
                 const opciones = equipoData.filter(eq => eq.tipo === tipoRequerido);
                 opciones.forEach(eq => {
                     const stock = eq.stock || 0;
                     const isEquipped = eq.id === idEquipado;
-                    
-                    // Solo mostrar si hay stock, o si es el que ya tiene puesto
                     if (stock > 0 || isEquipped) {
                         const isSelected = isEquipped ? 'selected' : '';
-                        const textStock = isEquipped ? '(Equipado)' : `(Disp: ${stock})`;
-                        select.innerHTML += `<option value="${eq.id}" ${isSelected}>${eq.nombre} ${textStock}</option>`;
+                        const modStr = eq.mod_cr ? `(+${eq.mod_cr})` : '';
+                        select.innerHTML += `<option value="${eq.id}" ${isSelected}>${eq.nombre} ${modStr}</option>`;
                     }
                 });
             };
 
-            rellenarSelect('slot-arma', 'Arma', equipoActual.arma);
-            rellenarSelect('slot-armadura', 'Armadura', equipoActual.armadura);
-            rellenarSelect('slot-util1', 'Utilidad', equipoActual.util1);
-            rellenarSelect('slot-util2', 'Utilidad', equipoActual.util2);
+            // Solo llenamos los 4 slots desbloqueados
+            rellenarSelect('slot-arma', 'Arma_Principal', equipoActual.arma);
+            rellenarSelect('slot-armadura', 'Armadura_Pecho', equipoActual.armadura);
+            rellenarSelect('slot-util1', 'Utilidad_Mochila', equipoActual.util1);
+            rellenarSelect('slot-util2', 'Utilidad_Mochila', equipoActual.util2);
+
+            calcularCRRealTime();
         };
 
-// --- CEREBRO DE GESTIÓN DE STOCK Y EQUIPO ---
 
-        // 1. Guardar el Equipamiento y Ajustar Stocks (Reemplaza al auto-guardado)
+        window.calcularCRRealTime = () => {
+            if(!soldadoEquipandoseId) return;
+            const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
+            let totalCR = Number(soldado.nivel) || 1;
+
+            // Solo calculamos el CR de los 4 slots activos
+            const idsSeleccionados = [
+                document.getElementById('slot-arma').value,
+                document.getElementById('slot-armadura').value,
+                document.getElementById('slot-util1').value,
+                document.getElementById('slot-util2').value
+            ];
+
+            idsSeleccionados.forEach(id => {
+                if (id) {
+                    const item = equipoData.find(eq => eq.id === id);
+                    if (item && item.mod_cr) {
+                        totalCR += Number(item.mod_cr);
+                    }
+                }
+            });
+
+            const crVisual = document.getElementById('diablo-cr-total');
+            crVisual.innerText = totalCR;
+            
+            if (totalCR > (Number(soldado.nivel) || 1)) {
+                crVisual.style.color = '#4CAF50';
+                crVisual.style.textShadow = '0 0 10px rgba(76, 175, 80, 0.5)';
+            } else {
+                crVisual.style.color = '#fff';
+                crVisual.style.textShadow = 'none';
+            }
+        };
+        
         window.guardarEquipamiento = async () => {
             if(!soldadoEquipandoseId) return;
             const btn = document.querySelector('#panel-slots-equipo button');
@@ -1272,31 +1524,32 @@ window.generarMisionAleatoria = async () => {
 
             const soldado = soldadosData.find(s => s.id === soldadoEquipandoseId);
             const eqViejo = soldado.equipo || {};
+            
+            // Guardamos solo los 4 slots activos. Los otros quedan vacíos en la BD.
             const eqNuevo = {
                 arma: document.getElementById('slot-arma').value,
+                arma_sec: '', 
                 armadura: document.getElementById('slot-armadura').value,
+                hombros: '',  
                 util1: document.getElementById('slot-util1').value,
                 util2: document.getElementById('slot-util2').value
             };
 
-            // Calcular qué entró y qué salió del inventario
-            let cambiosStock = {}; // Formato: { "idObjeto": delta } (Ej: +1 si se desequipa, -1 si se equipa)
-            const slots = ['arma', 'armadura', 'util1', 'util2'];
+            let cambiosStock = {}; 
+            const slots = ['arma', 'arma_sec', 'armadura', 'hombros', 'util1', 'util2'];
             
             slots.forEach(slot => {
                 let idViejo = eqViejo[slot];
                 let idNuevo = eqNuevo[slot];
                 if (idViejo !== idNuevo) {
-                    if (idViejo) cambiosStock[idViejo] = (cambiosStock[idViejo] || 0) + 1; // Devuelve al inventario
-                    if (idNuevo) cambiosStock[idNuevo] = (cambiosStock[idNuevo] || 0) - 1; // Saca del inventario
+                    if (idViejo) cambiosStock[idViejo] = (cambiosStock[idViejo] || 0) + 1; 
+                    if (idNuevo) cambiosStock[idNuevo] = (cambiosStock[idNuevo] || 0) - 1; 
                 }
             });
 
             try {
-                // Actualizar al Soldado
                 await updateDoc(doc(db, "soldados", soldadoEquipandoseId), { equipo: eqNuevo });
                 
-                // Actualizar los Stocks en Firebase
                 for (let [itemId, delta] of Object.entries(cambiosStock)) {
                     let item = equipoData.find(e => e.id === itemId);
                     if (item) {
@@ -1307,16 +1560,14 @@ window.generarMisionAleatoria = async () => {
                 
                 alert("Equipamiento asignado. Armería actualizada.");
                 await cargarTodo(); 
-                // Restaurar vista
-                cargarSoldadosArmeria();
                 document.getElementById('select-soldado-armeria').value = soldadoEquipandoseId;
                 cargarSlotsArmeria();
 
             } catch(e) { console.error("Error asignando:", e); }
-            finally { btn.innerText = "💾 Confirmar y Asignar Equipamiento"; btn.disabled = false; }
+            finally { btn.innerText = "💾 Confirmar Loadout y Procesar Stock"; btn.disabled = false; }
         };
-
-        // 2. Modificación Rápida de Stock (+ / -)
+        
+        
         window.modificarStock = async (id, delta) => {
             const item = equipoData.find(e => e.id === id);
             if(!item) return;
@@ -1337,6 +1588,20 @@ window.generarMisionAleatoria = async () => {
             document.getElementById('edit-eq-desc').value = equipoEnEdicion.descripcion;
             document.getElementById('edit-eq-cr').value = equipoEnEdicion.mod_cr || 0;
             abrirModal('modal-editar-equipo');
+        };
+
+        // 5. Lógica para Editar Vehículos Existentes
+        window.abrirEditarVehiculo = (id) => {
+            vehiculoEnEdicion = vehiculosData.find(v => v.id === id);
+            document.getElementById('edit-veh-nombre').value = vehiculoEnEdicion.nombre || '';
+            document.getElementById('edit-veh-foto').value = vehiculoEnEdicion.foto || '';
+            document.getElementById('edit-veh-desc').value = vehiculoEnEdicion.descripcion || '';
+            document.getElementById('edit-veh-hp').value = vehiculoEnEdicion.hp || 0;
+            document.getElementById('edit-veh-ac').value = vehiculoEnEdicion.ac || 0;
+            document.getElementById('edit-veh-vel').value = vehiculoEnEdicion.vel || 0;
+            document.getElementById('edit-veh-cap').value = vehiculoEnEdicion.cap || 0;
+            document.getElementById('edit-veh-cr').value = vehiculoEnEdicion.mod_cr || 0;
+            abrirModal('modal-editar-vehiculo');
         };
 
         document.getElementById('formulario-editar-equipo').addEventListener('submit', async (e) => {
@@ -1369,21 +1634,6 @@ window.generarMisionAleatoria = async () => {
             cargarTodo();
         });
 
-        document.getElementById('formulario-vehiculo').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nuevo = {
-                nombre: document.getElementById('inp-veh-nombre').value,
-                descripcion: document.getElementById('inp-veh-desc').value,
-                hp: parseInt(document.getElementById('inp-veh-hp').value) || 0,
-                ac: parseInt(document.getElementById('inp-veh-ac').value) || 0,
-                vel: parseInt(document.getElementById('inp-veh-vel').value) || 0,
-                cap: parseInt(document.getElementById('inp-veh-cap').value) || 0
-            };
-            await addDoc(collection(db, "vehiculos"), nuevo);
-            cerrarModal('modal-vehiculo');
-            e.target.reset();
-            cargarTodo();
-        });
 
         window.eliminarObjeto = async (id, coleccion) => {
             if(!confirm("¿Destruir este objeto permanentemente?")) return;
@@ -1393,6 +1643,255 @@ window.generarMisionAleatoria = async () => {
             } catch(e) { console.error("Error destruyendo:", e); }
         };
 
+// --- LÓGICA DEL HANGAR (NUEVO SISTEMA MAESTRO-DETALLE) ---
+        function renderizarHangar() {
+            const nav = document.getElementById('lista-vehiculos-nav');
+            nav.innerHTML = '';
+            
+            if(vehiculosData.length === 0) {
+                nav.innerHTML = '<p style="color:#aaa;">Hangar vacío.</p>';
+                return;
+            }
+
+            vehiculosData.forEach(veh => {
+                const item = document.createElement('div');
+                item.className = 'fila-tropa'; // Hereda la base visual de la armería
+                item.style.borderLeft = '3px solid #795548'; // Borde café de vehículos
+                item.style.cursor = 'pointer';
+                item.style.marginBottom = '10px';
+                item.style.padding = '10px';
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.gap = '15px';
+                item.style.backgroundColor = '#1a1a24'; 
+                
+                const foto = veh.foto || 'https://via.placeholder.com/60/323245/888?text=V';
+                item.innerHTML = `
+                    <img src="${foto}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #3f3f5a;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 5px 0; color: #fff; font-size: 1.1rem;">${veh.nombre}</h4>
+                        <p style="margin: 0; font-size: 0.85rem; color: #aaa;">${veh.entorno} | ${veh.rol}</p>
+                    </div>
+                    <div style="text-align: right; background-color: #252533; padding: 5px 10px; border-radius: 4px; border: 1px solid #3f3f5a;">
+                        <span style="color: #9C27B0; font-weight: bold; font-size: 0.9rem;">+${veh.mod_cr || 0} CR</span>
+                    </div>
+                `;
+                item.addEventListener('click', () => mostrarDetallesVehiculo(veh));
+                nav.appendChild(item);
+            });
+            
+            // Refrescar selector de vehículos en Modal de Gestionar Escuadrón
+            const selectVeh = document.getElementById('select-vehiculo');
+            if(selectVeh && escuadronEnEdicion) {
+                selectVeh.innerHTML = '<option value="">A pie (Sin vehículo)</option>';
+                vehiculosData.filter(v => !v.escuadron_id || v.escuadron_id === escuadronEnEdicion.id).forEach(v => {
+                    const isSelected = escuadronEnEdicion.vehiculo_id === v.id ? 'selected' : '';
+                    selectVeh.innerHTML += `<option value="${v.id}" ${isSelected}>${v.nombre} (+${v.mod_cr || 0} CR)</option>`;
+                });
+            }
+        }
+
+        function mostrarDetallesVehiculo(veh) {
+            document.getElementById('tarjeta-vehiculo-vacia').style.display = 'none';
+            document.getElementById('detalle-vehiculo-view').style.display = 'block';
+
+            document.getElementById('det-veh-foto').src = veh.foto || 'https://via.placeholder.com/200x150/323245/888?text=Sin+Foto';
+            document.getElementById('det-veh-nombre').innerText = veh.nombre || 'Desconocido';
+            document.getElementById('det-veh-modelo').innerText = veh.modelo || 'Sin modelo';
+            document.getElementById('det-veh-clases').innerText = `${veh.entorno || 'Terrestre'} | ${veh.rol || 'Transporte'}`;
+            document.getElementById('det-veh-fabricante').innerText = `Fabricante: ${veh.fabricante || 'Desconocido'}`;
+
+            document.getElementById('det-veh-hp').innerText = veh.hp || 0;
+            document.getElementById('det-veh-ac').innerText = veh.ac || 0;
+            document.getElementById('det-veh-vel').innerText = `${veh.vel || 0} ft`;
+            document.getElementById('det-veh-cr').innerText = `+${veh.mod_cr || 0}`;
+
+            document.getElementById('det-veh-dim').innerText = veh.dimensiones || 'N/A';
+            document.getElementById('det-veh-velmax').innerText = veh.vel_max || 'N/A';
+            document.getElementById('det-veh-escudos').innerText = veh.escudos || 'Ninguno';
+            document.getElementById('det-veh-armamento').innerText = veh.armamento || 'Desarmado';
+
+            document.getElementById('det-veh-trip').innerText = veh.tripulacion || '1 Piloto';
+            document.getElementById('det-veh-pasajeros').innerText = veh.pasajeros || 0;
+            document.getElementById('det-veh-carga').innerText = veh.carga || '0 kg';
+            document.getElementById('det-veh-consumibles').innerText = veh.consumibles || 'N/A';
+
+            // Configurar botón editar
+            document.getElementById('btn-editar-vehiculo-detalle').onclick = () => {
+                vehiculoEnEdicion = veh;
+                document.getElementById('edit-veh-nombre').value = veh.nombre || '';
+                document.getElementById('edit-veh-modelo').value = veh.modelo || '';
+                document.getElementById('edit-veh-fab').value = veh.fabricante || '';
+                document.getElementById('edit-veh-foto').value = veh.foto || '';
+                document.getElementById('edit-veh-entorno').value = veh.entorno || 'Terrestre';
+                document.getElementById('edit-veh-rol').value = veh.rol || 'Transporte';
+                
+                document.getElementById('edit-veh-hp').value = veh.hp || 0;
+                document.getElementById('edit-veh-ac').value = veh.ac || 0;
+                document.getElementById('edit-veh-vel').value = veh.vel || 0;
+                document.getElementById('edit-veh-cr').value = veh.mod_cr || 0;
+
+                document.getElementById('edit-veh-armamento').value = veh.armamento || '';
+                document.getElementById('edit-veh-escudos').value = veh.escudos || '';
+                document.getElementById('edit-veh-velmax').value = veh.vel_max || '';
+                document.getElementById('edit-veh-dim').value = veh.dimensiones || '';
+                document.getElementById('edit-veh-trip').value = veh.tripulacion || '';
+                document.getElementById('edit-veh-pasajeros').value = veh.pasajeros || 0;
+                document.getElementById('edit-veh-carga').value = veh.carga || '';
+                document.getElementById('edit-veh-consumibles').value = veh.consumibles || '';
+                
+                abrirModal('modal-editar-vehiculo');
+            };
+        }
+
+        // GUARDAR VEHÍCULO NUEVO
+        document.getElementById('formulario-vehiculo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nuevo = {
+                nombre: document.getElementById('inp-veh-nombre').value,
+                modelo: document.getElementById('inp-veh-modelo').value,
+                fabricante: document.getElementById('inp-veh-fab').value,
+                foto: document.getElementById('inp-veh-foto').value,
+                entorno: document.getElementById('inp-veh-entorno').value,
+                rol: document.getElementById('inp-veh-rol').value,
+                
+                hp: parseInt(document.getElementById('inp-veh-hp').value) || 0,
+                ac: parseInt(document.getElementById('inp-veh-ac').value) || 0,
+                vel: parseInt(document.getElementById('inp-veh-vel').value) || 0,
+                mod_cr: parseFloat(document.getElementById('inp-veh-cr').value) || 0,
+                
+                armamento: document.getElementById('inp-veh-armamento').value,
+                escudos: document.getElementById('inp-veh-escudos').value,
+                vel_max: document.getElementById('inp-veh-velmax').value,
+                dimensiones: document.getElementById('inp-veh-dim').value,
+                tripulacion: document.getElementById('inp-veh-trip').value,
+                pasajeros: parseInt(document.getElementById('inp-veh-pasajeros').value) || 0,
+                carga: document.getElementById('inp-veh-carga').value,
+                consumibles: document.getElementById('inp-veh-consumibles').value,
+                escuadron_id: null
+            };
+            await addDoc(collection(db, "vehiculos"), nuevo);
+            cerrarModal('modal-vehiculo');
+            e.target.reset();
+            cargarTodo();
+        });
+
+        // GUARDAR EDICIÓN DE VEHÍCULO
+        document.getElementById('formulario-editar-vehiculo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const dataActualizada = {
+                    nombre: document.getElementById('edit-veh-nombre').value,
+                    modelo: document.getElementById('edit-veh-modelo').value,
+                    fabricante: document.getElementById('edit-veh-fab').value,
+                    foto: document.getElementById('edit-veh-foto').value,
+                    entorno: document.getElementById('edit-veh-entorno').value,
+                    rol: document.getElementById('edit-veh-rol').value,
+                    
+                    hp: parseInt(document.getElementById('edit-veh-hp').value) || 0,
+                    ac: parseInt(document.getElementById('edit-veh-ac').value) || 0,
+                    vel: parseInt(document.getElementById('edit-veh-vel').value) || 0,
+                    mod_cr: parseFloat(document.getElementById('edit-veh-cr').value) || 0,
+                    
+                    armamento: document.getElementById('edit-veh-armamento').value,
+                    escudos: document.getElementById('edit-veh-escudos').value,
+                    vel_max: document.getElementById('edit-veh-velmax').value,
+                    dimensiones: document.getElementById('edit-veh-dim').value,
+                    tripulacion: document.getElementById('edit-veh-trip').value,
+                    pasajeros: parseInt(document.getElementById('edit-veh-pasajeros').value) || 0,
+                    carga: document.getElementById('edit-veh-carga').value,
+                    consumibles: document.getElementById('edit-veh-consumibles').value
+                };
+                await updateDoc(doc(db, "vehiculos", vehiculoEnEdicion.id), dataActualizada);
+                cerrarModal('modal-editar-vehiculo');
+                cargarTodo();
+                
+                // Actualizar la vista automáticamente
+                mostrarDetallesVehiculo({...vehiculoEnEdicion, ...dataActualizada});
+            } catch(e) { console.error("Error editando vehiculo:", e); }
+        });
+
+        window.eliminarVehiculoActual = async () => {
+            if(!confirm("¿Desguazar este vehículo permanentemente?")) return;
+            try {
+                await deleteDoc(doc(db, "vehiculos", vehiculoEnEdicion.id));
+                cerrarModal('modal-editar-vehiculo');
+                document.getElementById('detalle-vehiculo-view').style.display = 'none';
+                document.getElementById('tarjeta-vehiculo-vacia').style.display = 'block';
+                cargarTodo();
+            } catch(e) { console.error("Error eliminando:", e); }
+        };
+
+    let filtroArmeriaActual = 'Arma'; // Por defecto muestra armas
+
+        window.filtrarInventarioUI = (categoria, btnElement) => {
+            filtroArmeriaActual = categoria;
+            // Estilos de botones
+            document.querySelectorAll('.mini-tab-btn').forEach(b => b.classList.remove('activo'));
+            btnElement.classList.add('activo');
+            renderizarArsenalUI(); // Redibujar la lista
+        };
+
+        // Reemplaza tu antigua función renderizarArsenal() por esta:
+        function renderizarArsenal() {
+            renderizarArsenalUI();
+            
+            // Llenar Desplegable de Soldados
+            const selectSoldado = document.getElementById('select-soldado-armeria');
+            selectSoldado.innerHTML = '<option value="">-- Elige un Soldado --</option>';
+            soldadosData.forEach(s => {
+                const nombreEsc = s.escuadron_id ? (escuadronesData.find(e => e.id === s.escuadron_id)?.nombre || 'En Escuadrón') : 'Libre';
+                selectSoldado.innerHTML += `<option value="${s.id}">${s.nombre} (${s.clase}) - [${nombreEsc}]</option>`;
+            });
+        }
+
+        function renderizarArsenalUI() {
+            const divEquipo = document.getElementById('lista-equipo');
+            divEquipo.innerHTML = '';
+            
+            // EL BUG ESTABA AQUÍ: "Armadura" contiene la palabra "Arma". 
+            // SOLUCIÓN: Buscar exactamente el inicio con el guion bajo (Ej: "Arma_" o "Armadura_")
+            const filtrados = equipoData.filter(eq => eq.tipo.startsWith(filtroArmeriaActual + '_'));
+
+            if(filtrados.length === 0) {
+                divEquipo.innerHTML = '<p style="color:#888;">No hay objetos en esta categoría.</p>';
+                return;
+            }
+            
+            filtrados.forEach(eq => {
+                const icono = eq.tipo.includes('Armadura') ? '🛡️' : eq.tipo.includes('Arma') ? '⚔️' : '🎒';
+                const subSlotClean = eq.tipo.replace('_', ' '); // Ej: "Arma_Principal" a "Arma Principal"
+                const modCrTexto = eq.mod_cr > 0 ? `+${eq.mod_cr}` : `${eq.mod_cr || 0}`;
+                const stockActual = eq.stock || 0;
+                const colorStock = stockActual > 0 ? '#4CAF50' : '#F44336';
+                
+                // Nota la clase 'inv-hover' que hace la magia de ocultar detalles
+                divEquipo.innerHTML += `
+                    <div class="fila-tropa inv-hover" style="border-left: 3px solid #9C27B0; flex-direction: column; align-items: flex-start; margin-bottom: 5px; padding: 10px; position: relative;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                            <strong style="color: #fff; font-size: 0.95rem;">${icono} ${eq.nombre}</strong>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-accion" style="background-color: #555; padding: 2px 5px; font-size: 0.7rem;" onclick="abrirEditarEquipo('${eq.id}')">⚙️</button>
+                                <button class="btn-accion rojo" style="padding: 2px 5px; font-size: 0.7rem;" onclick="eliminarObjeto('${eq.id}', 'equipo')">🗑️</button>
+                            </div>
+                        </div>
+                        <span style="font-size: 0.75rem; color: #aaa;">${subSlotClean}</span>
+                        
+                        <div class="inv-detalles">
+                            <span style="font-size: 0.8rem; color: #ccc; display: block; margin-bottom: 8px;"><i>${eq.descripcion}</i></span>
+                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                                <span style="font-size: 0.8rem; color: #4CAF50; font-weight: bold;">[Mod: ${modCrTexto} CR]</span>
+                                <div style="display: flex; align-items: center; background-color: #1a1a24; border-radius: 4px; border: 1px solid #3f3f5a;">
+                                    <button onclick="modificarStock('${eq.id}', -1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">-</button>
+                                    <span style="color: ${colorStock}; font-weight: bold; padding: 0 10px; font-size: 0.8rem;">Stock: ${stockActual}</span>
+                                    <button onclick="modificarStock('${eq.id}', 1)" style="background:none; border:none; color:white; cursor:pointer; padding: 2px 8px;">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
         // Al cargar la página, descargamos toda la info
         cargarTodo();
     </script>
